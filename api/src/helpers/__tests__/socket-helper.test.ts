@@ -1,7 +1,8 @@
 import { container } from "@app/inversify.config";
 import { TYPES } from "@app/types";
 import * as http from "http";
-import { SocketHelper } from "..";
+import { ConfigProvider, SocketHelper } from "..";
+import * as io from "socket.io";
 
 // SocketIO Mock
 jest.mock("socket.io", () => ({
@@ -14,7 +15,7 @@ jest.mock("socket.io", () => ({
   })),
 }));
 
-describe("SocektHelper", () => {
+describe("SocketHelper", () => {
   beforeEach(() => container.snapshot());
   afterEach(() => container.restore());
 
@@ -34,6 +35,27 @@ describe("SocektHelper", () => {
       // assert
       expect(controllers[0].init).toBeCalledWith("SOCKET");
       expect(controllers[1].init).toBeCalledWith("SOCKET");
+    });
+
+    it("should pass the front end URL for cors", () => {
+      // arrange
+      container.unbind(TYPES.ConfigProvider);
+      container.bind<ConfigProvider>(TYPES.ConfigProvider).toConstantValue({
+        getFrontendUrl: () => "http://localhost:3000",
+      } as ConfigProvider);
+
+      const helper = getInstance();
+      const controllers = [{ init: jest.fn() }, { init: jest.fn() }];
+
+      // act
+      helper.initiateServer(new http.Server(), controllers);
+
+      // assert
+      expect(io.Server).toHaveBeenCalledWith(expect.anything(), {
+        cors: {
+          origin: "http://localhost:3000",
+        },
+      });
     });
   });
 });

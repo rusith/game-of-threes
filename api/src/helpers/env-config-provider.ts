@@ -22,4 +22,8 @@ export class EnvConfigProvider implements ConfigProvider {
   public getRedisPassword(): string {
     return process.env.REDIS_PASSWORD!;
   }
+
+  public getFrontendUrl(): string {
+    return process.env.FRONTEND_URL!;
+  }
 }

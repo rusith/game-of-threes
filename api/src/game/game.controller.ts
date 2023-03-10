@@ -4,5 +4,12 @@ import { injectable } from "inversify";
 
 @injectable()
 export class GameControllerImpl implements GameController {
-  init(socket: IncomingSocket): void {}
+  public init(socket: IncomingSocket): void {
+    socket.on("game:create", this.createGame);
+  }
+
+  createGame = (data: any): void => {
+    console.log("data", data);
+    // throw new Error("Method not implemented.");
+  };
 }

@@ -1,6 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { socket } from "../socket";
 
 const HomePage: React.FC = () => {
+  useEffect(() => {
+    const onConnect = () => {
+      socket.emit("game:create", { data: "ABC" });
+      console.log("CONNECTED");
+    };
+
+    socket.on("connect", onConnect);
+
+    return () => {
+      socket.off("connect", onConnect);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col h-full items-center justify-center p-4">
       <h1 className="text-4xl md:text-6xl text-transparent bg-gradient-to-b from-white to-white-t-60 bg-clip-text">

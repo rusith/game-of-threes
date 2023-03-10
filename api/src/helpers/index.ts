@@ -20,6 +20,7 @@ export interface ConfigProvider {
   getRedisPassword(): string;
   getDbUrl(): string;
   getPort(): number;
+  getFrontendUrl(): string;
 }
 
 export interface SocketHelper {

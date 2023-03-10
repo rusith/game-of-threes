@@ -1,6 +1,5 @@
-import express from "express";
+// import express from "express";
 import http from "http";
-import cors from "cors";
 import { container } from "@app/inversify.config";
 import { ConfigProvider, DBHelper, SocketHelper } from "@app/helpers";
 import { TYPES } from "@app/types";
@@ -9,10 +8,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 async function initializeServer() {
-  const app = express();
-  app.use(cors());
-
-  const server = http.createServer(app);
+  const server = http.createServer();
 
   const dbHelper = container.get<DBHelper>(TYPES.DBHelper);
   const socketHelper = container.get<SocketHelper>(TYPES.SocketHelper);

@@ -16,7 +16,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 16.8.0
+          node-version: 18.10.0
 
       - uses: actions/cache@v3
         id: yarn-web-cache
@@ -50,7 +50,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 16.8.0
+          node-version: 18.10.0
 
       - uses: actions/cache@v3
         id: yarn-api-cache

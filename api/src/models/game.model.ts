@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { GameEvent, GameEventSchema } from "./schema/game-event";
 import { GamePlayer, GamePlayerSchema } from "./schema/game-player";
 
-interface Game {
+export interface Game {
   _id: string;
   players: GamePlayer[];
   events: GameEvent[];

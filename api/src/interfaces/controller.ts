@@ -1,5 +1,8 @@
 export interface IncomingSocket {
-  on: (eventName: string, handler: <T>(data: T) => unknown) => unknown;
+  on: <T>(
+    eventName: string,
+    handler: (data: T, cb: (...args: unknown[]) => unknown) => unknown
+  ) => unknown;
 }
 
 export interface Controller {

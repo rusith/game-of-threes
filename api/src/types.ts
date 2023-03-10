@@ -6,6 +6,8 @@ const TYPES = {
   Controller: Symbol.for("Controller"),
 
   GameController: Symbol.for("GameController"),
+  GameService: Symbol.for("GameService"),
+  GameRepository: Symbol.for("GameRepository"),
 };
 
 export { TYPES };

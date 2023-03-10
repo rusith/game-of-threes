@@ -12,8 +12,10 @@ import { MongoDBHelper } from "@app/helpers/mongodb-helper";
 import { SocketIOHelper } from "@app/helpers/socket-io-helper";
 import { TYPES } from "@app/types";
 import { GameControllerImpl } from "@app/game/game.controller";
-import { GameController } from "./game";
+import { GameController, GameRepository, GameService } from "./game";
 import { Controller } from "./interfaces/controller";
+import { GameServiceImpl } from "./game/game.service";
+import { MongoDBGameRepository } from "./game/game.repository";
 
 const container = new Container();
 container.bind<DBHelper>(TYPES.DBHelper).to(MongoDBHelper).inSingletonScope();
@@ -41,6 +43,16 @@ container
 container
   .bind<GameController>(TYPES.GameController)
   .to(GameControllerImpl)
+  .inSingletonScope();
+
+container
+  .bind<GameService>(TYPES.GameService)
+  .to(GameServiceImpl)
+  .inSingletonScope();
+
+container
+  .bind<GameRepository>(TYPES.GameRepository)
+  .to(MongoDBGameRepository)
   .inSingletonScope();
 
 export { container };

@@ -1,15 +1,23 @@
 import { IncomingSocket } from "@app/interfaces/controller";
-import { GameController } from ".";
-import { injectable } from "inversify";
+import { GameController, GameService, NewGameDTO } from ".";
+import { inject, injectable } from "inversify";
+import { TYPES } from "@app/types";
 
 @injectable()
 export class GameControllerImpl implements GameController {
+  public constructor(
+    @inject(TYPES.GameService)
+    private readonly gameService: GameService
+  ) {}
+
   public init(socket: IncomingSocket): void {
-    socket.on("game:create", this.createGame);
+    socket.on("newGame", this.newGame);
   }
 
-  createGame = (data: any): void => {
-    console.log("data", data);
-    // throw new Error("Method not implemented.");
+  newGame = async (
+    data: NewGameDTO,
+    cb: (id: string) => unknown
+  ): Promise<void> => {
+    this.gameService.newGame(data.playerName, data.gameType);
   };
 }

@@ -53,9 +53,10 @@ export type GameEvent =
   | WinGameEvent;
 
 export const GameEventSchema = new mongoose.Schema<GameEvent>({
+  _id: { type: mongoose.Schema.Types.String, required: true },
   type: { type: String, required: true, enum: Object.values(GameEventType) },
   player: {
-    type: GamePlayerSchema.clone().pick(["_id", "name"]),
+    type: GamePlayerSchema.clone()?.pick(["_id", "name"]),
     required: true,
   },
   meta: {

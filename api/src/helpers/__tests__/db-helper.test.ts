@@ -2,24 +2,11 @@ import { container } from "@app/inversify.config";
 import { TYPES } from "@app/types";
 import mongoose from "mongoose";
 import { DBHelper } from "..";
-import { MongoDBHelper } from "../mongodb-helper";
 jest.mock("mongoose");
 
-describe("MongoDBHelper", () => {
-  beforeAll(() => {
-    container
-      .rebind<DBHelper>(TYPES.DBHelper)
-      .to(MongoDBHelper)
-      .inSingletonScope();
-  });
-
-  beforeEach(() => {
-    container.snapshot();
-  });
-
-  afterEach(() => {
-    container.restore();
-  });
+describe("DBHelper", () => {
+  beforeEach(() => container.snapshot());
+  afterEach(() => container.restore());
 
   function getInstance() {
     return container.get<DBHelper>(TYPES.DBHelper);

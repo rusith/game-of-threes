@@ -1,4 +1,3 @@
-import { SocketIOHelper } from "@app/helpers/socket-io-helper";
 import { container } from "@app/inversify.config";
 import { TYPES } from "@app/types";
 import * as http from "http";
@@ -15,21 +14,9 @@ jest.mock("socket.io", () => ({
   })),
 }));
 
-describe("SocketIOHelper", () => {
-  beforeAll(() => {
-    container
-      .rebind<SocketHelper>(TYPES.SocketHelper)
-      .to(SocketIOHelper)
-      .inSingletonScope();
-  });
-
-  beforeEach(() => {
-    container.snapshot();
-  });
-
-  afterEach(() => {
-    container.restore();
-  });
+describe("SocektHelper", () => {
+  beforeEach(() => container.snapshot());
+  afterEach(() => container.restore());
 
   function getInstance() {
     return container.get<SocketHelper>(TYPES.SocketHelper);

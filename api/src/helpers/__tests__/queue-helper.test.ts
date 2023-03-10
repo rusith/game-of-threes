@@ -1,4 +1,3 @@
-import { BullQueueHelper } from "../bull-queue-helper";
 import { Queue } from "bullmq";
 import { container } from "@app/inversify.config";
 import { ConfigProvider, QueueHelper } from "..";
@@ -10,21 +9,9 @@ jest.mock("bullmq", () => ({
   })),
 }));
 
-describe("BullQueueHelper", () => {
-  beforeAll(() => {
-    container
-      .rebind<QueueHelper>(TYPES.QueueHelper)
-      .to(BullQueueHelper)
-      .inSingletonScope();
-  });
-
-  beforeEach(() => {
-    container.snapshot();
-  });
-
-  afterEach(() => {
-    container.restore();
-  });
+describe("QueueHelper", () => {
+  beforeEach(() => container.snapshot());
+  afterEach(() => container.restore());
 
   function getInstance() {
     return container.get<QueueHelper>(TYPES.QueueHelper);

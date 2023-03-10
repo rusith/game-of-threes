@@ -1,5 +1,8 @@
-import { Controller, IncomingSocket } from "@app/interfaces/controller";
+import { IncomingSocket } from "@app/interfaces/controller";
+import { GameController } from ".";
+import { injectable } from "inversify";
 
-export class GameController implements Controller {
+@injectable()
+export class GameControllerImpl implements GameController {
   init(socket: IncomingSocket): void {}
 }

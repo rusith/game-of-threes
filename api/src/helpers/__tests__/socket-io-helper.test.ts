@@ -1,5 +1,8 @@
-import { SockerHelper } from "@app/helpers/socket.helper";
+import { SocketIOHelper } from "@app/helpers/socket-io-helper";
+import { container } from "@app/inversify.config";
+import { TYPES } from "@app/types";
 import * as http from "http";
+import { SocketHelper } from "..";
 
 // SocketIO Mock
 jest.mock("socket.io", () => ({
@@ -12,15 +15,34 @@ jest.mock("socket.io", () => ({
   })),
 }));
 
-describe("SocketHelper", () => {
+describe("SocketIOHelper", () => {
+  beforeAll(() => {
+    container
+      .rebind<SocketHelper>(TYPES.SocketHelper)
+      .to(SocketIOHelper)
+      .inSingletonScope();
+  });
+
+  beforeEach(() => {
+    container.snapshot();
+  });
+
+  afterEach(() => {
+    container.restore();
+  });
+
+  function getInstance() {
+    return container.get<SocketHelper>(TYPES.SocketHelper);
+  }
+
   describe("initiateServer", () => {
     it("it should call the init function of all provided controllers", () => {
       // arrange
-      const sockerHelper = new SockerHelper();
+      const helper = getInstance();
       const controllers = [{ init: jest.fn() }, { init: jest.fn() }];
 
       // act
-      sockerHelper.initiateServer(new http.Server(), controllers);
+      helper.initiateServer(new http.Server(), controllers);
 
       // assert
       expect(controllers[0].init).toBeCalledWith("SOCKET");

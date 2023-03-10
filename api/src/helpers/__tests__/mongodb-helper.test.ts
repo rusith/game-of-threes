@@ -1,13 +1,34 @@
+import { container } from "@app/inversify.config";
+import { TYPES } from "@app/types";
 import mongoose from "mongoose";
-import { DBHelper } from "../db.helper";
+import { DBHelper } from "..";
+import { MongoDBHelper } from "../mongodb-helper";
 jest.mock("mongoose");
 
-describe("DBHelper", () => {
+describe("MongoDBHelper", () => {
+  beforeAll(() => {
+    container
+      .rebind<DBHelper>(TYPES.DBHelper)
+      .to(MongoDBHelper)
+      .inSingletonScope();
+  });
+
+  beforeEach(() => {
+    container.snapshot();
+  });
+
+  afterEach(() => {
+    container.restore();
+  });
+
+  function getInstance() {
+    return container.get<DBHelper>(TYPES.DBHelper);
+  }
+
   describe("connect", () => {
     it("should throw an error if the connection string does not exist", async () => {
       // arrange
-      const dbHelper = new DBHelper();
-
+      const dbHelper = getInstance();
       // act
       const action = dbHelper.connect("");
 
@@ -19,7 +40,7 @@ describe("DBHelper", () => {
 
     it("should call mongoose.connect with the provided connection string", async () => {
       // arrange
-      const dbHelper = new DBHelper();
+      const dbHelper = getInstance();
       const connectSpy = jest.spyOn(mongoose, "connect");
 
       // act

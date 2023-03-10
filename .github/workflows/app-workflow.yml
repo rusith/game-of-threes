@@ -1,0 +1,99 @@
+
+name: App Workflow
+on:
+  push:
+jobs:
+  lint-and-test-web:
+    name: Lint and test web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.8.0
+
+      - uses: actions/cache@v3
+        id: yarn-web-cache
+        with:
+          path: 'web/node_modules'
+          key: ${{runner.os}}-modules-${{hashFiles('web/yarn.lock')}}
+
+      - name: Install Dependancies
+        if: steps.yarn-web-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Run lint
+        run: yarn lint
+
+      - name: Run tests
+        run: yarn test
+  lint-and-test-api:
+    name: Lint and test web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.8.0
+
+      - uses: actions/cache@v3
+        id: yarn-api-cache
+        with:
+          path: 'api/node_modules'
+          key: ${{runner.os}}-modules-${{hashFiles('api/yarn.lock')}}
+
+      - name: Install Dependancies
+        if: steps.yarn-api-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Run lint
+       run: yarn lint
+
+      - name: Run tests
+        run: yarn test
+
+  lint-and-test-runner:
+    name: Lint and test runner
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.8.0
+
+      - uses: actions/cache@v3
+        id: yarn-runner-cache
+        with:
+          path: 'runner/node_modules'
+          key: ${{runner.os}}-modules-${{hashFiles('runner/yarn.lock')}}
+
+      - name: Install Dependancies
+        if: steps.yarn-runner-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Run lint
+        run: yarn lint

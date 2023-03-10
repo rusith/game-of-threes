@@ -4,17 +4,27 @@ import cors from "cors";
 import config from "@app/config";
 import { SockerHelper } from "@app/helpers/socket.helper";
 import { GameController } from "@app/game/game.controller";
+import { DBHelper } from "@app/helpers/db.helper";
 
-const app = express();
-app.use(cors());
+async function initializeServer() {
+  const app = express();
+  app.use(cors());
 
-const server = http.createServer(app);
+  const server = http.createServer(app);
 
-const controllers = [new GameController()];
+  const controllers = [new GameController()];
 
-const socketHelper = new SockerHelper();
-socketHelper.initiateServer(server, controllers);
+  const socketHelper = new SockerHelper();
+  const dbHelper = new DBHelper();
 
-server.listen(config.port, () =>
-  console.log(`Listening on port ${config.port}`)
-);
+  await dbHelper.connect(config.dbUrl());
+  socketHelper.initiateServer(server, controllers);
+
+  server.listen(config.port(), () =>
+    console.log(`Listening on port ${config.port()}`)
+  );
+}
+
+initializeServer()
+  .then(() => console.log("Server started"))
+  .catch(console.error);

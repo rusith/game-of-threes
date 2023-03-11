@@ -16,6 +16,8 @@ import { GameController, GameRepository, GameService } from "./game";
 import { Controller } from "./interfaces/controller";
 import { GameServiceImpl } from "./game/game.service";
 import { MongoDBGameRepository } from "./game/game.repository";
+import { GameEventsQueue } from "./queues";
+import { GameEventsQueueImpl } from "./queues/game-events.queue";
 
 const container = new Container();
 container.bind<DBHelper>(TYPES.DBHelper).to(MongoDBHelper).inSingletonScope();
@@ -53,6 +55,11 @@ container
 container
   .bind<GameRepository>(TYPES.GameRepository)
   .to(MongoDBGameRepository)
+  .inSingletonScope();
+
+container
+  .bind<GameEventsQueue>(TYPES.GameEventsQueue)
+  .to(GameEventsQueueImpl)
   .inSingletonScope();
 
 export { container };

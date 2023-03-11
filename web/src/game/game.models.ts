@@ -1,6 +1,17 @@
-import mongoose from "mongoose";
-import { GamePlayer, GamePlayerSchema } from "./game-player";
-import { GameEventType } from "@app/enums/game-event.type.enum";
+export enum GameEventType {
+  SendNumber = "SendNumber",
+  AddNumber = "AddNumber",
+  LoseHeart = "LoseHeart",
+  Init = "Init",
+  PlayerJoined = "PlayerJoined",
+  Win = "Win",
+}
+
+export interface GamePlayer {
+  _id: string;
+  name: string;
+  remainingHearts: number;
+}
 
 interface BaseGameEvent {
   _id: string;
@@ -36,7 +47,7 @@ interface InitGameEvent extends BaseGameEvent {
   type: GameEventType.Init;
 }
 
-export interface PlayerJoinedGameEvent extends BaseGameEvent {
+interface PlayerJoinedGameEvent extends BaseGameEvent {
   type: GameEventType.PlayerJoined;
 }
 
@@ -52,19 +63,15 @@ export type GameEvent =
   | PlayerJoinedGameEvent
   | WinGameEvent;
 
-export const GameEventSchema = new mongoose.Schema<GameEvent>({
-  _id: { type: mongoose.Schema.Types.String, required: true },
-  type: { type: String, required: true, enum: Object.values(GameEventType) },
-  player: {
-    type: GamePlayerSchema.clone()?.pick(["_id", "name"]),
-    required: true,
-  },
-  meta: {
-    value: { type: mongoose.Schema.Types.Number },
-    original: { type: mongoose.Schema.Types.Number },
-    result: { type: mongoose.Schema.Types.Number },
-    divisor: { type: mongoose.Schema.Types.Number },
-    lost: { type: mongoose.Schema.Types.Number },
-    remaining: { type: mongoose.Schema.Types.Number },
-  },
-});
+export enum GameType {
+  Automatic = "Automatic",
+  Manual = "Manual",
+  VsComputer = "VsComputer",
+}
+
+export interface Game {
+  _id: string;
+  players: GamePlayer[];
+  events: GameEvent[];
+  type: GameType;
+}

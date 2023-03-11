@@ -1,6 +1,5 @@
 import { Controller } from "@app/interfaces/controller";
 import http from "http";
-import { inject } from "inversify";
 
 export interface DBHelper {
   connect(dbUrl: string): Promise<void>;

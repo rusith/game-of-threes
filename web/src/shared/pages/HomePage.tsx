@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
-import Modal from "../components/shared/Modal";
-import { socket } from "../socket";
+import { useNavigate } from "react-router-dom";
+import Modal from "../components/Modal";
+import { socket } from "../../socket";
 
 const HomePage: React.FC = () => {
   const [isConnected, setIsConnected] = React.useState(false);
   const [isShowNewGameModal, setIsShowNewGameModal] = React.useState(false);
   const [playerName, setPlayerName] = React.useState("");
   const [gameType, setGameType] = React.useState("Manual");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onConnect = () => {
@@ -32,7 +35,7 @@ const HomePage: React.FC = () => {
         gameType,
       },
       (val: string) => {
-        console.log(val);
+        navigate("/game/" + val);
       }
     );
   }

@@ -10,7 +10,8 @@ jest.mock("socket.io", () => ({
     on: jest
       .fn()
       .mockImplementation((name: string, cb: (...args: any) => unknown) => {
-        if (name === "connection") cb("SOCKET");
+        if (name === "connection")
+          cb({ handshake: { auth: { userId: "user_id" } } });
       }),
   })),
 }));
@@ -24,20 +25,20 @@ describe("SocketHelper", () => {
   }
 
   describe("initiateServer", () => {
-    it("it should call the init function of all provided controllers", () => {
+    it("it should call the init function of all provided controllers with userId", async () => {
       // arrange
       const helper = getInstance();
       const controllers = [{ init: jest.fn() }, { init: jest.fn() }];
 
       // act
-      helper.initiateServer(new http.Server(), controllers);
+      await helper.initiateServer(new http.Server(), controllers);
 
       // assert
-      expect(controllers[0].init).toBeCalledWith("SOCKET");
-      expect(controllers[1].init).toBeCalledWith("SOCKET");
+      expect(controllers[0].init).toBeCalledWith(expect.any(Object), "user_id");
+      expect(controllers[1].init).toBeCalledWith(expect.any(Object), "user_id");
     });
 
-    it("should pass the front end URL for cors", () => {
+    it("should pass the front end URL for cors", async () => {
       // arrange
       container.unbind(TYPES.ConfigProvider);
       container.bind<ConfigProvider>(TYPES.ConfigProvider).toConstantValue({
@@ -48,7 +49,7 @@ describe("SocketHelper", () => {
       const controllers = [{ init: jest.fn() }, { init: jest.fn() }];
 
       // act
-      helper.initiateServer(new http.Server(), controllers);
+      await helper.initiateServer(new http.Server(), controllers);
 
       // assert
       expect(io.Server).toHaveBeenCalledWith(expect.anything(), {

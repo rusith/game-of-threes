@@ -6,5 +6,5 @@ export interface IncomingSocket {
 }
 
 export interface Controller {
-  init(socket: IncomingSocket): void;
+  init(socket: IncomingSocket, userId: string): void;
 }

@@ -22,7 +22,7 @@ export class SocketIOHelper implements SocketHelper {
 
     socketServer.on("connection", (socket) => {
       for (const controller of controllers) {
-        controller.init(socket);
+        controller.init(socket, socket.handshake.auth.userId as string);
       }
     });
   }

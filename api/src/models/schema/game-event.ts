@@ -7,38 +7,6 @@ interface BaseGameEvent {
   player: Pick<GamePlayer, "_id" | "name" | "color">;
 }
 
-// interface SendNumberGameEvent extends BaseGameEvent {
-//   type: GameEventType.SendNumber;
-//   meta: {
-//     value: number;
-//   };
-// }
-
-// interface AddNumberGameEvent extends BaseGameEvent {
-//   type: GameEventType.AddNumber;
-//   meta: {
-//     value: number;
-//     original: number;
-//     result: number;
-//     divisor: number;
-//   };
-// }
-
-// interface InitGameEvent extends BaseGameEvent {
-//   type: GameEventType.Init;
-//   meta: {
-//     value: number;
-//   };
-// }
-
-// export interface PlayerJoinedGameEvent extends BaseGameEvent {
-//   type: GameEventType.PlayerJoined;
-// }
-
-// interface WinGameEvent extends BaseGameEvent {
-//   type: GameEventType.Win;
-// }
-
 export interface InitialNumberGameEvent extends BaseGameEvent {
   type: GameEventType.InitialNumber;
   number: number;

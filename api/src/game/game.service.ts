@@ -3,11 +3,11 @@ import { Game } from "@app/models/game.model";
 import { TYPES } from "@app/types";
 import { inject, injectable } from "inversify";
 import {
-  DivideNumberDTO,
+  DivideNumberRequest,
   GameRepository,
   GameService,
-  JoinGameDTO,
-  SendInitialNumberDTO as SendInitialNumberDTO,
+  JoinGameRequest,
+  SendInitialNumberRequest as SendInitialNumberRequest,
 } from ".";
 import { GameEventsQueue } from "@app/queues";
 import { GameEvent } from "@app/models/schema/game-event";
@@ -44,7 +44,7 @@ export class GameServiceImpl implements GameService {
   }
 
   public async joinGame(
-    data: JoinGameDTO,
+    data: JoinGameRequest,
     userId: string,
     socket: IncomingSocket
   ): Promise<Game> {
@@ -110,8 +110,8 @@ export class GameServiceImpl implements GameService {
     return this.gameRepository.get(id);
   }
 
-  public async sendInitialNumber(
-    data: SendInitialNumberDTO,
+  public async handleSendInitialNumberRequest(
+    data: SendInitialNumberRequest,
     userId: string
   ): Promise<void> {
     const game = await this.gameRepository.get(data.gameId);
@@ -148,7 +148,7 @@ export class GameServiceImpl implements GameService {
   }
 
   public async handleDivideNumberRequest(
-    request: DivideNumberDTO,
+    request: DivideNumberRequest,
     playerId: string
   ): Promise<void> {
     const game = await this.gameRepository.get(request.gameId);

@@ -1,12 +1,20 @@
-import { GameEventType } from "@app/enums/game-event.type.enum";
 import { GameType } from "@app/enums/game-type.enum";
-import { Game, GameModel } from "@app/models/game.model";
+import { Game } from "@app/models/game.model";
 import { TYPES } from "@app/types";
 import { inject, injectable } from "inversify";
-import { GameRepository, GameService, JoinGameDTO } from ".";
-import Crypto from "crypto";
+import {
+  DivideNumberDTO,
+  GameRepository,
+  GameService,
+  JoinGameDTO,
+  SendInitialNumberDTO as SendInitialNumberDTO,
+} from ".";
 import { GameEventsQueue } from "@app/queues";
-import { PlayerJoinedGameEvent } from "@app/models/schema/game-event";
+import { GameEvent } from "@app/models/schema/game-event";
+import { IncomingSocket } from "@app/interfaces/controller";
+import { GameEventType } from "@app/enums/game-event.type.enum";
+import { nanoid } from "nanoid";
+import { GamePlayer } from "@app/models/schema/game-player";
 
 @injectable()
 export class GameServiceImpl implements GameService {
@@ -17,15 +25,7 @@ export class GameServiceImpl implements GameService {
     private readonly gameEventsQueue: GameEventsQueue
   ) {}
 
-  public async newGame(
-    playerName: string,
-    gameType: GameType,
-    userId: string
-  ): Promise<string> {
-    if (!playerName) {
-      throw new Error("Player name is required");
-    }
-
+  public async newGame(gameType: GameType, userId: string): Promise<string> {
     if (!gameType) {
       throw new Error("Game type is required");
     }
@@ -35,61 +35,251 @@ export class GameServiceImpl implements GameService {
     }
 
     const newGame: Omit<Game, "_id"> = {
-      players: [
-        {
-          _id: userId,
-          name: playerName,
-          remainingHearts: 3,
-        },
-      ],
+      players: [],
       type: gameType,
-      events: [
-        {
-          _id: Crypto.randomUUID(),
-          type: GameEventType.Init,
-          player: {
-            _id: userId,
-            name: playerName,
-          },
-        },
-      ],
+      events: [],
     };
 
     return this.gameRepository.create(newGame);
   }
 
-  public async joinGame(data: JoinGameDTO, userId: string): Promise<Game> {
+  public async joinGame(
+    data: JoinGameDTO,
+    userId: string,
+    socket: IncomingSocket
+  ): Promise<Game> {
     const game = await this.gameRepository.get(data.gameId);
 
-    if (game.players.length > 1) {
-      throw new Error("Game is full");
+    if (!game) {
+      throw new Error("Game not found");
     }
 
-    const event = {
-      _id: Crypto.randomUUID(),
-      type: GameEventType.PlayerJoined,
-      player: {
-        _id: userId,
-        name: data.playerName!,
-      },
-    } as PlayerJoinedGameEvent;
+    const playerExists = game.players.find((p) => p._id === userId);
 
-    await this.gameRepository.update(data.gameId, {
-      players: [
-        ...game.players,
-        {
-          _id: userId,
-          name: data.playerName!,
-          remainingHearts: 3,
-        },
-      ],
-      events: [...game.events, event],
-    });
+    if (!playerExists) {
+      const otherPlayers = game.players.filter((p) => p._id !== userId);
+      if (otherPlayers.length > 1) {
+        throw new Error("Game is full");
+      }
+    }
 
-    this.gameEventsQueue.sendEvent(GameEventType.PlayerJoined, {
-      event,
+    let automatic = false;
+    if (game.type === GameType.Automatic) {
+      automatic = true;
+    } else if (game.type === GameType.VsComputer) {
+      automatic = game.players.length === 1;
+    }
+
+    const colors = ["#01E6F4", "#51FE14"];
+
+    function getRandomColor(): string {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      if (game.players.some((p) => p.color === color)) {
+        return getRandomColor();
+      }
+      return color;
+    }
+
+    if (!playerExists) {
+      await this.gameRepository.update(data.gameId, {
+        players: [
+          ...game.players,
+          {
+            _id: userId,
+            name:
+              data.playerName ||
+              (game.players.length === 1 ? "Player 2" : "Player 1"),
+            remainingLives: 3,
+            automatic,
+            color: getRandomColor(),
+          },
+        ],
+      });
+    }
+
+    this.startHanlingEventsForUser(game._id.toString(), userId, socket);
+
+    await this.gameEventsQueue.sendEvent(game._id.toString(), {
+      event: "PLAYER_JOINED",
     });
 
     return game;
+  }
+
+  public async getGame(id: string): Promise<Game> {
+    return this.gameRepository.get(id);
+  }
+
+  public async sendInitialNumber(
+    data: SendInitialNumberDTO,
+    userId: string
+  ): Promise<void> {
+    const game = await this.gameRepository.get(data.gameId);
+    if (!game) {
+      throw new Error("Game not found!");
+    }
+
+    if (game.events.length) {
+      throw new Error("Game already initialized!");
+    }
+
+    const player = game.players.find((p) => p._id === userId);
+
+    if (!player) {
+      throw new Error("Player not found!");
+    }
+
+    const event = {
+      _id: nanoid(20),
+      type: GameEventType.InitialNumber,
+      player: {
+        _id: userId,
+        name: player.name,
+        color: player.color,
+      },
+      number: data.number,
+    } as GameEvent;
+
+    await this.gameRepository.update(data.gameId, {
+      events: [...game.events, event],
+    });
+
+    await this.gameEventsQueue.sendEvent(data.gameId, "EVENT_ADDED");
+  }
+
+  public async handleDivideNumberRequest(
+    request: DivideNumberDTO,
+    playerId: string
+  ): Promise<void> {
+    const game = await this.gameRepository.get(request.gameId);
+
+    // validations
+    if (!game) throw new Error("Game not found!");
+    if (!playerId) throw new Error("Player id is required!");
+
+    const player = game.players.find((p) => p._id === playerId);
+
+    if (!player) throw new Error("Player not found!");
+
+    let lastEvent = this.getLastEvent(game);
+
+    if (!lastEvent) throw new Error("Game not initialized!");
+    if (lastEvent.player._id === playerId) throw new Error("Not your turn!");
+
+    if (
+      lastEvent.type === GameEventType.DivideNumber ||
+      lastEvent.type === GameEventType.InitialNumber
+    ) {
+      if ((lastEvent.number + request.addition) % 3 !== 0) {
+        const events = [
+          {
+            _id: nanoid(20),
+            type: GameEventType.LoseLife,
+            player: this.getEventPlayer(player),
+            remainigLives: player.remainingLives - 1,
+            number: lastEvent.number + request.addition,
+          },
+        ] as GameEvent[];
+
+        if (player.remainingLives === 1) {
+          const otherPlayer = game.players.find((p) => p._id !== playerId)!;
+          events.push({
+            _id: nanoid(20),
+            type: GameEventType.Winner,
+            player: this.getEventPlayer(otherPlayer),
+          } as GameEvent);
+        }
+
+        await this.gameRepository.update(game._id, {
+          players: game.players.map((p) =>
+            p._id === playerId
+              ? {
+                  ...p,
+                  remainingLives: p.remainingLives - 1,
+                }
+              : p
+          ),
+        });
+        await this.addEventsToGame(request.gameId, game.events, events);
+        return;
+      }
+
+      const number = (lastEvent.number + request.addition) / 3;
+      const events = [
+        {
+          _id: nanoid(20),
+          type: GameEventType.DivideNumber,
+          number,
+          player: this.getEventPlayer(player),
+          original: lastEvent.number,
+          addition: request.addition,
+          withAddition: lastEvent.number + request.addition,
+        },
+      ] as GameEvent[];
+
+      if (number === 1) {
+        events.push({
+          _id: nanoid(20),
+          type: GameEventType.Winner,
+          player: {
+            _id: playerId,
+            name: player.name,
+            color: player.color,
+          },
+        });
+      }
+
+      await this.addEventsToGame(request.gameId, game.events, events);
+    }
+  }
+
+  private getEventPlayer(
+    player: GamePlayer
+  ): Pick<GamePlayer, "_id" | "color" | "name"> {
+    return {
+      _id: player._id,
+      name: player.name,
+      color: player.color,
+    };
+  }
+
+  private getLastEvent(game: Game, index = -1): GameEvent | undefined {
+    const event = game.events.at(index);
+    if (event?.type === GameEventType.LoseLife) {
+      return this.getLastEvent(game, index - 1);
+    }
+    return event;
+  }
+
+  private async addEventsToGame(
+    gameId: string,
+    existingEvents: GameEvent[],
+    newEvents: GameEvent[]
+  ) {
+    await this.gameRepository.update(gameId, {
+      events: [...(existingEvents || []), ...(newEvents || [])],
+    });
+
+    await this.gameEventsQueue.sendEvent(gameId, "EVENT_ADDED");
+  }
+
+  private startHanlingEventsForUser(
+    gameId: string,
+    userId: string,
+    socket: IncomingSocket
+  ) {
+    this.gameEventsQueue.listenToEvents(gameId, (event) =>
+      this.handleEvent(userId, gameId, event, socket)
+    );
+  }
+
+  private async handleEvent(
+    userId: string,
+    gameId: string,
+    event: GameEvent,
+    socket: IncomingSocket
+  ) {
+    const game = await this.gameRepository.get(gameId);
+    socket.emit("gameUpdated", game);
   }
 }

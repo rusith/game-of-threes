@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { TYPES } from "@app/types";
-import { Queue } from "bullmq";
 import { inject, injectable } from "inversify";
-import { ConfigProvider, QueueHelper } from ".";
+import { ConfigProvider, Queue, QueueHelper } from ".";
+import { Queue as BullQueue } from "bullmq";
 
 @injectable()
 export class BullQueueHelper implements QueueHelper {
@@ -12,7 +12,7 @@ export class BullQueueHelper implements QueueHelper {
   ) {}
 
   public createQueue(name: string): Queue {
-    return new Queue(name, {
+    return new BullQueue(name, {
       connection: {
         host: this.configProvider.getRedisHost(),
         port: this.configProvider.getRedisPort(),

@@ -1,8 +1,8 @@
 import { GameType } from "@app/enums/game-type.enum";
-import { Controller } from "@app/interfaces/controller";
+import { Controller, IncomingSocket } from "@app/interfaces/controller";
 import { Game } from "@app/models/game.model";
+import { GameEvent } from "@app/models/schema/game-event";
 export interface NewGameDTO {
-  playerName: string;
   gameType: GameType;
 }
 
@@ -11,18 +11,43 @@ export interface JoinGameDTO {
   playerName?: string;
 }
 
+// TODO better names
+export interface SendInitialNumberDTO {
+  gameId: string;
+  number: number;
+}
+
+export interface DivideNumberDTO {
+  gameId: string;
+  addition: number;
+}
+
 export interface GameController extends Controller {
   newGame(data: NewGameDTO, userId: string): Promise<string>;
-  joinGame(id: JoinGameDTO, userId: string): Promise<Game>;
+  getGame(id: string): Promise<Game>;
+
+  joinGame(
+    id: JoinGameDTO,
+    userId: string,
+    socket: IncomingSocket
+  ): Promise<Game>;
+
+  sendInitialNumber(id: SendInitialNumberDTO, userId: string): Promise<void>;
 }
 
 export interface GameService {
-  newGame(
-    playerName: string,
-    gameType: GameType,
+  newGame(gameType: GameType, userId: string): Promise<string>;
+  getGame(id: string): Promise<Game>;
+  joinGame(
+    id: JoinGameDTO,
+    userId: string,
+    socket: IncomingSocket
+  ): Promise<Game>;
+  sendInitialNumber(data: SendInitialNumberDTO, userId: string): Promise<void>;
+  handleDivideNumberRequest(
+    request: DivideNumberDTO,
     userId: string
-  ): Promise<string>;
-  joinGame(id: JoinGameDTO, userId: string): Promise<Game>;
+  ): Promise<void>;
 }
 
 export interface GameRepository {

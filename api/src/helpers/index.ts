@@ -7,6 +7,8 @@ export interface DBHelper {
 
 export interface Queue {
   name: string;
+  add: <T>(name: string, data: T) => Promise<any>;
+  addListener<T>(name: string, callback: (data: T) => Promise<void>): void;
 }
 
 export interface QueueHelper {

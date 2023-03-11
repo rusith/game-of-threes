@@ -3,6 +3,7 @@ export interface IncomingSocket {
     eventName: string,
     handler: (data: T, cb: (...args: unknown[]) => unknown) => unknown
   ) => unknown;
+  emit: <T>(eventName: string, data: T) => unknown;
 }
 
 export interface Controller {

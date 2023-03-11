@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
 import { socket } from "../../socket";
+import { toast } from "react-hot-toast";
 
 const HomePage: React.FC = () => {
-  const [isConnected, setIsConnected] = React.useState(false);
+  const [isConnected, setIsConnected] = React.useState(socket.connected);
   const [isShowNewGameModal, setIsShowNewGameModal] = React.useState(false);
-  const [playerName, setPlayerName] = React.useState("");
   const [gameType, setGameType] = React.useState("Manual");
 
   const navigate = useNavigate();
@@ -31,11 +31,14 @@ const HomePage: React.FC = () => {
     socket.emit(
       "newGame",
       {
-        playerName,
         gameType,
       },
-      (val: string) => {
-        navigate("/game/" + val);
+      (val: any) => {
+        if (val.error) {
+          toast.error(val.error);
+        } else {
+          navigate("/game/" + val);
+        }
       }
     );
   }
@@ -60,17 +63,7 @@ const HomePage: React.FC = () => {
       </button>
 
       {isShowNewGameModal && (
-        <Modal>
-          <div className="flex flex-col">
-            <label>Your Name</label>
-            <input
-              type="text"
-              className="h-9 rounded mt-1 p-1 text-gray-700 outline-none"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-            />
-          </div>
-
+        <Modal width="w-60">
           <div className="flex flex-col mt-3">
             <label>Game Type</label>
             <select
@@ -100,7 +93,7 @@ const HomePage: React.FC = () => {
           <div className="flex justify-center">
             <button
               className="p-2 bg-blue-500 mt-6 rounded hover:scale-110 duration-100 disabled:bg-gray-400"
-              disabled={!isConnected || !playerName}
+              disabled={!isConnected}
               onClick={handleStartGame}
             >
               <p className="text-1xl text-transparent bg-gradient-to-b from-white to-white-t-60 bg-clip-text">
@@ -110,7 +103,6 @@ const HomePage: React.FC = () => {
             <button
               className="p-2 bg-red-500 mt-6 rounded hover:scale-110 duration-100 disabled:bg-gray-400 ml-5"
               onClick={() => {
-                setPlayerName("");
                 setGameType("Manual");
                 setIsShowNewGameModal(false);
               }}

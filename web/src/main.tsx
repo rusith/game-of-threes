@@ -8,8 +8,8 @@ import { Toaster } from "react-hot-toast";
 const router = createBrowserRouter(routes);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
+  <>
     <Toaster />
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </>
 );

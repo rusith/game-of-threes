@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { useGameStore } from "../game.state";
 
 const WaitingForPlayer: React.FC = () => {
-  const { gameId } = useGameStore();
+  const gameId = useGameStore((s) => s.gameId);
 
   function copyLinkToClipboard() {
     const el = document.createElement("textarea");

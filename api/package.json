@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint",
     "test": "jest",
-    "dev": "nodemon --watch . --exec ts-node src/index.ts",
+    "dev": "nodemon --watch . --exec ts-node src/index.ts --",
     "build": "tsc",
     "test:watch": "jest --watch"
   },
@@ -40,6 +40,7 @@
     "express": "^4.18.2",
     "inversify": "^6.0.1",
     "mongoose": "^7.0.1",
+    "nanoid": "3.3.4",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^4.6.1"
   }

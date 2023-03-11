@@ -73,7 +73,7 @@ describe("GameService", () => {
           {
             _id: "user_id",
             name: "test",
-            remainingHearts: 3,
+            remainingLives: 3,
           },
         ],
         type: GameType.Automatic,
@@ -169,7 +169,7 @@ describe("GameService", () => {
             {
               _id: "user_id_1",
               name: "Player 1",
-              remainingHearts: 1,
+              remainingLives: 1,
             },
           ],
           events: [],
@@ -196,12 +196,12 @@ describe("GameService", () => {
           {
             _id: "user_id_1",
             name: "Player 1",
-            remainingHearts: 1,
+            remainingLives: 1,
           },
           {
             _id: "user_id",
             name: "New Player",
-            remainingHearts: 3,
+            remainingLives: 3,
           },
         ],
         events: [

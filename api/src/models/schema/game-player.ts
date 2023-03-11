@@ -3,7 +3,9 @@ import mongoose, { Schema } from "mongoose";
 export interface GamePlayer {
   _id: string;
   name: string;
-  remainingHearts: number;
+  remainingLives: number;
+  automatic: boolean;
+  color: string;
 }
 
 export const GamePlayerSchema = new mongoose.Schema<
@@ -11,7 +13,9 @@ export const GamePlayerSchema = new mongoose.Schema<
   mongoose.Model<GamePlayer>,
   GamePlayer
 >({
+  automatic: { type: mongoose.Schema.Types.Boolean, required: true },
   _id: { type: mongoose.Schema.Types.String, required: true },
   name: { type: mongoose.Schema.Types.String, required: true },
-  remainingHearts: { type: mongoose.Schema.Types.Number, required: true },
+  remainingLives: { type: mongoose.Schema.Types.Number, required: true },
+  color: { type: mongoose.Schema.Types.String, required: true },
 });

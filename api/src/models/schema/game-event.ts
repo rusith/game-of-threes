@@ -4,67 +4,81 @@ import { GameEventType } from "@app/enums/game-event.type.enum";
 
 interface BaseGameEvent {
   _id: string;
-  player: Pick<GamePlayer, "_id" | "name">;
+  player: Pick<GamePlayer, "_id" | "name" | "color">;
 }
 
-interface SendNumberGameEvent extends BaseGameEvent {
-  type: GameEventType.SendNumber;
-  meta: {
-    value: number;
-  };
+// interface SendNumberGameEvent extends BaseGameEvent {
+//   type: GameEventType.SendNumber;
+//   meta: {
+//     value: number;
+//   };
+// }
+
+// interface AddNumberGameEvent extends BaseGameEvent {
+//   type: GameEventType.AddNumber;
+//   meta: {
+//     value: number;
+//     original: number;
+//     result: number;
+//     divisor: number;
+//   };
+// }
+
+// interface InitGameEvent extends BaseGameEvent {
+//   type: GameEventType.Init;
+//   meta: {
+//     value: number;
+//   };
+// }
+
+// export interface PlayerJoinedGameEvent extends BaseGameEvent {
+//   type: GameEventType.PlayerJoined;
+// }
+
+// interface WinGameEvent extends BaseGameEvent {
+//   type: GameEventType.Win;
+// }
+
+export interface InitialNumberGameEvent extends BaseGameEvent {
+  type: GameEventType.InitialNumber;
+  number: number;
 }
 
-interface AddNumberGameEvent extends BaseGameEvent {
-  type: GameEventType.AddNumber;
-  meta: {
-    value: number;
-    original: number;
-    result: number;
-    divisor: number;
-  };
+export interface DivideNumberGameEvent extends BaseGameEvent {
+  type: GameEventType.DivideNumber;
+
+  original: number;
+  number: number;
+  addition: number;
+  withAddition: number;
 }
 
-interface LoseHeartGameEvent extends BaseGameEvent {
-  type: GameEventType.LoseHeart;
-  meta: {
-    lost: number;
-    remaining: number;
-  };
+export interface WinnerGameEvent extends BaseGameEvent {
+  type: GameEventType.Winner;
 }
 
-interface InitGameEvent extends BaseGameEvent {
-  type: GameEventType.Init;
-}
-
-export interface PlayerJoinedGameEvent extends BaseGameEvent {
-  type: GameEventType.PlayerJoined;
-}
-
-interface WinGameEvent extends BaseGameEvent {
-  type: GameEventType.Win;
+interface LoseLifeGameEvent extends BaseGameEvent {
+  type: GameEventType.LoseLife;
+  remainigLives: number;
+  number: number;
 }
 
 export type GameEvent =
-  | SendNumberGameEvent
-  | AddNumberGameEvent
-  | LoseHeartGameEvent
-  | InitGameEvent
-  | PlayerJoinedGameEvent
-  | WinGameEvent;
+  | InitialNumberGameEvent
+  | DivideNumberGameEvent
+  | WinnerGameEvent
+  | LoseLifeGameEvent;
 
 export const GameEventSchema = new mongoose.Schema<GameEvent>({
   _id: { type: mongoose.Schema.Types.String, required: true },
   type: { type: String, required: true, enum: Object.values(GameEventType) },
   player: {
-    type: GamePlayerSchema.clone()?.pick(["_id", "name"]),
+    type: GamePlayerSchema.clone()?.pick(["_id", "name", "color"]),
     required: true,
   },
-  meta: {
-    value: { type: mongoose.Schema.Types.Number },
-    original: { type: mongoose.Schema.Types.Number },
-    result: { type: mongoose.Schema.Types.Number },
-    divisor: { type: mongoose.Schema.Types.Number },
-    lost: { type: mongoose.Schema.Types.Number },
-    remaining: { type: mongoose.Schema.Types.Number },
-  },
+  number: { type: mongoose.Schema.Types.Number },
+  original: { type: mongoose.Schema.Types.Number },
+  addition: { type: mongoose.Schema.Types.Number },
+  withAddition: { type: mongoose.Schema.Types.Number },
+  remainigLives: { type: mongoose.Schema.Types.Number },
 });

@@ -13,5 +13,7 @@ export class MongoDBGameRepository implements GameRepository {
     return await GameModel.findById(id).lean();
   }
 
-  public async update(id: string, game: Partial<Game>): Promise<void> {}
+  public async update(id: string, game: Partial<Game>): Promise<void> {
+    await GameModel.updateOne({ _id: id }, { $set: game });
+  }
 }

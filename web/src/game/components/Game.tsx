@@ -84,7 +84,7 @@ const Game: React.FC = () => {
 
   return (
     <div className="text-white flex justify-center align-middle mt-20 w-auto ">
-      <div className="flex flex-col w-fit mb-10 ">
+      <div className="flex flex-col min-w-[15rem] md:min-w-[30rem] mb-10 ">
         <div className="flex justify-between">
           {game.players.map((p) => (
             <p key={p._id}>

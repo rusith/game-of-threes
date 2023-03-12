@@ -11,7 +11,8 @@ Game of three is a game where you start with a number and repeatedly divide it b
 1. Make sure you have the latest version of Docker with Docker Compose installed on your machine.
 2. Clone the repository.
 3. Run `docker-compose up` in the root directory of the project.
-4. Open `http://localhost:5173` in your browser.
+4. Make sure the app and API are running.
+5. Open `http://localhost:5173` in your browser.
 
 This will start a development server.
 

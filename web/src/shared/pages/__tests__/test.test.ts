@@ -1,5 +1,7 @@
-import React from "react";
+import React from 'react';
 
-describe("Test", () => {
-  it("should pass", () => {});
+describe('Test', () => {
+  it('should pass', () => {
+    /* */
+  });
 });

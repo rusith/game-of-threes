@@ -134,7 +134,7 @@ describe('GameService', () => {
       await service.joinGame(
         { gameId: 'game_id', playerName: 'SSS' },
         'user_id',
-        {} as IncomingSocket
+        { on: jest.fn(), emit: jest.fn() } as IncomingSocket
       );
 
       // assert

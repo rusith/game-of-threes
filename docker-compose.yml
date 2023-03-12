@@ -1,0 +1,39 @@
+services:
+  api:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - PORT=8080
+      - DB_URI=mongodb://db/got
+      - FRONTEND_URL=http://localhost:5173
+      - REDIS_URL=redis://redis:6379
+  db:
+    image: mongo:latest
+  redis:
+    image: redis:latest
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://api:8080
+
+    

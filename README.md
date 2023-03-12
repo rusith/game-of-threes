@@ -54,6 +54,19 @@ click the `Join` button.
   - React Router for routing.
   - Tailwind CSS for styling.
   - Vite for bundling.
+- The `game` folder contains specific components and state for the game which is the main feature of the app.
+- The `shared` folder contains shared components for example, `Modal`.
+
+### API notes
+
+- The app is a a Node.JS application
+- Uses Socket.io to create the API.
+  - Dotenv for configuration.
+  - Vite for bundling.
+  - Jest for testing.
+  - Mongoose for database connection.
+  - Redis for pub/sub.
+  - Inversify for dependency injection.
 - The `game` module is the main module of the app.
   - `game.controller.ts` is the controller which binds the incoming socket connections with the game service.
   - `game.service.ts` is the service which contains the logic of the game.
@@ -64,19 +77,17 @@ click the `Join` button.
 - The `helpers` folder contains specific helper classes for example, `MongoDBHelper`.
 - All components are decoupled by implementing the interfaces defined in the `index.ts` file of respective modules.
 
-### API notes
+### CI/CD
 
-- The app is a a Node.JS application
-- Uses Socket.io to create the API.
-  - Dotenv for configuration.
-  - vite for bundling.
-  - Jest for testing.
-  - Mongoose for database connection.
-  - Redis for pub/sub.
-  - Inversify for dependency injection.
-- The `game` folder contains specific components and state for the game which is the main feature of the app.
-- The `shared` folder contains shared components for example, `Modal`.
+- The app and the API will be tested and linted for every push using Github Actions.
+- The workflow is defined in the `.github/workflows` folder.
 
 ### Possible AWS architecture 
 
 ![](./docs/images/aws.jpg)
+
+
+### UX Design (Initial design)
+
+[Figma](https://www.figma.com/file/XC8AZwsZi2vPGVHY5PK7NT/Game-of-Three?node-id=0%3A1&t=4PQaKn2vrGkvaAuQ-1)
+

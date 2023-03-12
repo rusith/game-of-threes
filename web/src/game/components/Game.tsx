@@ -73,11 +73,11 @@ const Game: React.FC = () => {
       };
 
       if (player.automatic) {
-        if (divicibleBy3(lastEvent.number + 0)) setTimeout(() => emit(0), 1000);
+        if (divicibleBy3(lastEvent.number + 0)) setTimeout(() => emit(0), 500);
         else if (divicibleBy3(lastEvent.number + 1))
-          setTimeout(() => emit(1), 1000);
+          setTimeout(() => emit(1), 500);
         else if (divicibleBy3(lastEvent.number - 1))
-          setTimeout(() => emit(-1), 1000);
+          setTimeout(() => emit(-1), 500);
       }
     }
   }

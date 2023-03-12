@@ -1,4 +1,4 @@
-import { GameType } from '@app/enums/game-type.enum';
+import { GameType } from '@app/game/enums/game-type.enum';
 import { Game } from '@app/models/game.model';
 import { TYPES } from '@app/types';
 import { inject, injectable } from 'inversify';
@@ -12,7 +12,7 @@ import {
 } from '.';
 import { GameEvent } from '@app/models/schema/game-event';
 import { IncomingSocket } from '@app/interfaces/controller';
-import { GameEventType } from '@app/enums/game-event.type.enum';
+import { GameEventType } from '@app/game/enums/game-event.type.enum';
 import { nanoid } from 'nanoid';
 import { GamePlayer } from '@app/models/schema/game-player';
 

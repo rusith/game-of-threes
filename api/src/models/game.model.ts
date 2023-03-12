@@ -1,4 +1,4 @@
-import { GameType } from '@app/enums/game-type.enum';
+import { GameType } from '@app/game/enums/game-type.enum';
 import mongoose from 'mongoose';
 import { GameEvent, GameEventSchema } from './schema/game-event';
 import { GamePlayer, GamePlayerSchema } from './schema/game-player';

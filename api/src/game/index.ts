@@ -1,4 +1,4 @@
-import { GameType } from '@app/enums/game-type.enum';
+import { GameType } from '@app/game/enums/game-type.enum';
 import { IncomingSocket } from '@app/interfaces/controller';
 import { Game } from '@app/models/game.model';
 

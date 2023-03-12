@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { GamePlayer, GamePlayerSchema } from './game-player';
-import { GameEventType } from '@app/enums/game-event.type.enum';
+import { GameEventType } from '@app/game/enums/game-event.type.enum';
 
 interface BaseGameEvent {
   _id: string;

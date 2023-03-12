@@ -16,7 +16,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "jest.config.js"],
+  "include": ["**/*.ts", "**/*.tsx", "jest.config.js", ".eslintrc.js"],
   "exclude": ["node_modules"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]

@@ -1,6 +1,6 @@
-import { GameType } from "@app/enums/game-type.enum";
-import { IncomingSocket } from "@app/interfaces/controller";
-import { Game } from "@app/models/game.model";
+import { GameType } from '@app/enums/game-type.enum';
+import { IncomingSocket } from '@app/interfaces/controller';
+import { Game } from '@app/models/game.model';
 
 export interface NewGameRequest {
   gameType: GameType;
@@ -40,7 +40,13 @@ export interface GameService {
 }
 
 export interface GameRepository {
-  create: (game: Omit<Game, "_id">) => Promise<string>;
+  create: (game: Omit<Game, '_id'>) => Promise<string>;
   get(id: string): Promise<Game>;
   update: (id: string, game: Partial<Game>) => Promise<void>;
+}
+
+export interface GamePubSub {
+  init(): Promise<void>;
+  addListener(gameId: string, callback: (game: Game) => unknown): void;
+  publish(game: Game): Promise<void>;
 }

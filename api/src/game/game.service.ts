@@ -1,43 +1,43 @@
-import { GameType } from "@app/enums/game-type.enum";
-import { Game } from "@app/models/game.model";
-import { TYPES } from "@app/types";
-import { inject, injectable } from "inversify";
+import { GameType } from '@app/enums/game-type.enum';
+import { Game } from '@app/models/game.model';
+import { TYPES } from '@app/types';
+import { inject, injectable } from 'inversify';
 import {
   DivideNumberRequest,
+  GamePubSub,
   GameRepository,
   GameService,
   JoinGameRequest,
-  SendInitialNumberRequest as SendInitialNumberRequest,
-} from ".";
-import { GameEventsQueue } from "@app/queues";
-import { GameEvent } from "@app/models/schema/game-event";
-import { IncomingSocket } from "@app/interfaces/controller";
-import { GameEventType } from "@app/enums/game-event.type.enum";
-import { nanoid } from "nanoid";
-import { GamePlayer } from "@app/models/schema/game-player";
+  SendInitialNumberRequest as SendInitialNumberRequest
+} from '.';
+import { GameEvent } from '@app/models/schema/game-event';
+import { IncomingSocket } from '@app/interfaces/controller';
+import { GameEventType } from '@app/enums/game-event.type.enum';
+import { nanoid } from 'nanoid';
+import { GamePlayer } from '@app/models/schema/game-player';
 
 @injectable()
 export class GameServiceImpl implements GameService {
   public constructor(
     @inject(TYPES.GameRepository)
     private readonly gameRepository: GameRepository,
-    @inject(TYPES.GameEventsQueue)
-    private readonly gameEventsQueue: GameEventsQueue
+    @inject(TYPES.GamePubSub)
+    private readonly gamePubSub: GamePubSub
   ) {}
 
   public async newGame(gameType: GameType, userId: string): Promise<string> {
     if (!gameType) {
-      throw new Error("Game type is required");
+      throw new Error('Game type is required');
     }
 
     if (!userId) {
-      throw new Error("User id is required");
+      throw new Error('User id is required');
     }
 
-    const newGame: Omit<Game, "_id"> = {
+    const newGame: Omit<Game, '_id'> = {
       players: [],
       type: gameType,
-      events: [],
+      events: []
     };
 
     return this.gameRepository.create(newGame);
@@ -51,7 +51,7 @@ export class GameServiceImpl implements GameService {
     const game = await this.gameRepository.get(data.gameId);
 
     if (!game) {
-      throw new Error("Game not found");
+      throw new Error('Game not found');
     }
 
     const playerExists = game.players.find((p) => p._id === userId);
@@ -59,7 +59,7 @@ export class GameServiceImpl implements GameService {
     if (!playerExists) {
       const otherPlayers = game.players.filter((p) => p._id !== userId);
       if (otherPlayers.length > 1) {
-        throw new Error("Game is full");
+        throw new Error('Game is full');
       }
     }
 
@@ -70,7 +70,7 @@ export class GameServiceImpl implements GameService {
       automatic = game.players.length === 1;
     }
 
-    const colors = ["#01E6F4", "#51FE14"];
+    const colors = ['#01E6F4', '#51FE14'];
 
     function getRandomColor(): string {
       const color = colors[Math.floor(Math.random() * colors.length)];
@@ -81,27 +81,26 @@ export class GameServiceImpl implements GameService {
     }
 
     if (!playerExists) {
-      await this.gameRepository.update(data.gameId, {
-        players: [
-          ...game.players,
-          {
-            _id: userId,
-            name:
-              data.playerName ||
-              (game.players.length === 1 ? "Player 2" : "Player 1"),
-            remainingLives: 3,
-            automatic,
-            color: getRandomColor(),
-          },
-        ],
-      });
+      game.players = [
+        ...game.players,
+        {
+          _id: userId,
+          name:
+            data.playerName ||
+            (game.players.length === 1 ? 'Player 2' : 'Player 1'),
+          remainingLives: 3,
+          automatic,
+          color: getRandomColor()
+        }
+      ];
+      await this.gameRepository.update(data.gameId, game);
     }
 
-    this.startHanlingEventsForUser(game._id.toString(), userId, socket);
+    this.gamePubSub.addListener(game._id.toString(), (game) =>
+      socket.emit('gameUpdated', game)
+    );
 
-    await this.gameEventsQueue.sendEvent(game._id.toString(), {
-      event: "PLAYER_JOINED",
-    });
+    await this.gamePubSub.publish(game);
 
     return game;
   }
@@ -116,17 +115,17 @@ export class GameServiceImpl implements GameService {
   ): Promise<void> {
     const game = await this.gameRepository.get(data.gameId);
     if (!game) {
-      throw new Error("Game not found!");
+      throw new Error('Game not found!');
     }
 
     if (game.events.length) {
-      throw new Error("Game already initialized!");
+      throw new Error('Game already initialized!');
     }
 
     const player = game.players.find((p) => p._id === userId);
 
     if (!player) {
-      throw new Error("Player not found!");
+      throw new Error('Player not found!');
     }
 
     const event = {
@@ -135,16 +134,16 @@ export class GameServiceImpl implements GameService {
       player: {
         _id: userId,
         name: player.name,
-        color: player.color,
+        color: player.color
       },
-      number: data.number,
+      number: data.number
     } as GameEvent;
 
-    await this.gameRepository.update(data.gameId, {
-      events: [...game.events, event],
-    });
+    game.events = [...game.events, event];
 
-    await this.gameEventsQueue.sendEvent(data.gameId, "EVENT_ADDED");
+    await this.gameRepository.update(data.gameId, game);
+
+    await this.gamePubSub.publish(game);
   }
 
   public async handleDivideNumberRequest(
@@ -154,17 +153,17 @@ export class GameServiceImpl implements GameService {
     const game = await this.gameRepository.get(request.gameId);
 
     // validations
-    if (!game) throw new Error("Game not found!");
-    if (!playerId) throw new Error("Player id is required!");
+    if (!game) throw new Error('Game not found!');
+    if (!playerId) throw new Error('Player id is required!');
 
     const player = game.players.find((p) => p._id === playerId);
 
-    if (!player) throw new Error("Player not found!");
+    if (!player) throw new Error('Player not found!');
 
-    let lastEvent = this.getLastEvent(game);
+    const lastEvent = this.getLastEvent(game);
 
-    if (!lastEvent) throw new Error("Game not initialized!");
-    if (lastEvent.player._id === playerId) throw new Error("Not your turn!");
+    if (!lastEvent) throw new Error('Game not initialized!');
+    if (lastEvent.player._id === playerId) throw new Error('Not your turn!');
 
     if (
       lastEvent.type === GameEventType.DivideNumber ||
@@ -177,30 +176,30 @@ export class GameServiceImpl implements GameService {
             type: GameEventType.LoseLife,
             player: this.getEventPlayer(player),
             remainigLives: player.remainingLives - 1,
-            number: lastEvent.number + request.addition,
-          },
+            number: lastEvent.number + request.addition
+          }
         ] as GameEvent[];
 
         if (player.remainingLives === 1) {
-          const otherPlayer = game.players.find((p) => p._id !== playerId)!;
+          const otherPlayer = game.players.find((p) => p._id !== playerId);
+          if (!otherPlayer) throw new Error('Other player not found!');
+
           events.push({
             _id: nanoid(20),
             type: GameEventType.Winner,
-            player: this.getEventPlayer(otherPlayer),
+            player: this.getEventPlayer(otherPlayer)
           } as GameEvent);
         }
 
-        await this.gameRepository.update(game._id, {
-          players: game.players.map((p) =>
-            p._id === playerId
-              ? {
-                  ...p,
-                  remainingLives: p.remainingLives - 1,
-                }
-              : p
-          ),
-        });
-        await this.addEventsToGame(request.gameId, game.events, events);
+        game.players = game.players.map((p) =>
+          p._id === playerId
+            ? {
+                ...p,
+                remainingLives: p.remainingLives - 1
+              }
+            : p
+        );
+        await this.addEventsToGame(game, events);
         return;
       }
 
@@ -213,8 +212,8 @@ export class GameServiceImpl implements GameService {
           player: this.getEventPlayer(player),
           original: lastEvent.number,
           addition: request.addition,
-          withAddition: lastEvent.number + request.addition,
-        },
+          withAddition: lastEvent.number + request.addition
+        }
       ] as GameEvent[];
 
       if (number === 1) {
@@ -224,22 +223,22 @@ export class GameServiceImpl implements GameService {
           player: {
             _id: playerId,
             name: player.name,
-            color: player.color,
-          },
+            color: player.color
+          }
         });
       }
 
-      await this.addEventsToGame(request.gameId, game.events, events);
+      await this.addEventsToGame(game, events);
     }
   }
 
   private getEventPlayer(
     player: GamePlayer
-  ): Pick<GamePlayer, "_id" | "color" | "name"> {
+  ): Pick<GamePlayer, '_id' | 'color' | 'name'> {
     return {
       _id: player._id,
       name: player.name,
-      color: player.color,
+      color: player.color
     };
   }
 
@@ -251,26 +250,10 @@ export class GameServiceImpl implements GameService {
     return event;
   }
 
-  private async addEventsToGame(
-    gameId: string,
-    existingEvents: GameEvent[],
-    newEvents: GameEvent[]
-  ) {
-    await this.gameRepository.update(gameId, {
-      events: [...(existingEvents || []), ...(newEvents || [])],
-    });
-
-    await this.gameEventsQueue.sendEvent(gameId, "EVENT_ADDED");
-  }
-
-  private startHanlingEventsForUser(
-    gameId: string,
-    userId: string,
-    socket: IncomingSocket
-  ) {
-    this.gameEventsQueue.listenToEvents(gameId, (event) =>
-      this.handleEvent(userId, gameId, event, socket)
-    );
+  private async addEventsToGame(game: Game, newEvents: GameEvent[]) {
+    game.events = [...(game.events || []), ...(newEvents || [])];
+    await this.gameRepository.update(game._id, game);
+    await this.gamePubSub.publish(game);
   }
 
   private async handleEvent(
@@ -280,6 +263,6 @@ export class GameServiceImpl implements GameService {
     socket: IncomingSocket
   ) {
     const game = await this.gameRepository.get(gameId);
-    socket.emit("gameUpdated", game);
+    socket.emit('gameUpdated', game);
   }
 }

@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
-import { GamePlayer, GamePlayerSchema } from "./game-player";
-import { GameEventType } from "@app/enums/game-event.type.enum";
+import mongoose from 'mongoose';
+import { GamePlayer, GamePlayerSchema } from './game-player';
+import { GameEventType } from '@app/enums/game-event.type.enum';
 
 interface BaseGameEvent {
   _id: string;
-  player: Pick<GamePlayer, "_id" | "name" | "color">;
+  player: Pick<GamePlayer, '_id' | 'name' | 'color'>;
 }
 
 export interface InitialNumberGameEvent extends BaseGameEvent {
@@ -41,12 +41,12 @@ export const GameEventSchema = new mongoose.Schema<GameEvent>({
   _id: { type: mongoose.Schema.Types.String, required: true },
   type: { type: String, required: true, enum: Object.values(GameEventType) },
   player: {
-    type: GamePlayerSchema.clone()?.pick(["_id", "name", "color"]),
-    required: true,
+    type: GamePlayerSchema.clone()?.pick(['_id', 'name', 'color']),
+    required: true
   },
   number: { type: mongoose.Schema.Types.Number },
   original: { type: mongoose.Schema.Types.Number },
   addition: { type: mongoose.Schema.Types.Number },
   withAddition: { type: mongoose.Schema.Types.Number },
-  remainigLives: { type: mongoose.Schema.Types.Number },
+  remainigLives: { type: mongoose.Schema.Types.Number }
 });

@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from 'mongoose';
 
 export interface GamePlayer {
   _id: string;
@@ -17,5 +17,5 @@ export const GamePlayerSchema = new mongoose.Schema<
   _id: { type: mongoose.Schema.Types.String, required: true },
   name: { type: mongoose.Schema.Types.String, required: true },
   remainingLives: { type: mongoose.Schema.Types.Number, required: true },
-  color: { type: mongoose.Schema.Types.String, required: true },
+  color: { type: mongoose.Schema.Types.String, required: true }
 });

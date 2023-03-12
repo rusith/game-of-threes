@@ -1,13 +1,13 @@
-import { Controller } from "@app/interfaces/controller";
-import { container } from "@app/inversify.config";
-import { TYPES } from "@app/types";
-import { GameService } from "..";
+import { Controller } from '@app/interfaces/controller';
+import { container } from '@app/inversify.config';
+import { TYPES } from '@app/types';
+import { GameService } from '..';
 
-describe("GameControlles", () => {
+describe('GameControlles', () => {
   beforeEach(() => container.snapshot());
   afterEach(() => container.restore());
 
-  describe("init", () => {
+  describe('init', () => {
     beforeEach(() => {
       container.unbind(TYPES.GameService);
       container.bind<GameService>(TYPES.GameService).toConstantValue({} as any);
@@ -29,7 +29,7 @@ describe("GameControlles", () => {
         on: jest.fn().mockImplementation((eventName: string, handler) => {
           map.set(eventName, handler);
         }),
-        emit: jest.fn(),
+        emit: jest.fn()
       };
 
       return {
@@ -39,286 +39,286 @@ describe("GameControlles", () => {
           if (map.has(name)) {
             await map.get(name)!(data, callback);
           }
-        },
+        }
       };
     }
 
-    describe("newGame", () => {
-      it("should call newGame of game service", async () => {
+    describe('newGame', () => {
+      it('should call newGame of game service', async () => {
         // arrange
-        const newGame = jest.fn().mockResolvedValue("game_id");
+        const newGame = jest.fn().mockResolvedValue('game_id');
         mockGameService({
-          newGame,
+          newGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
-        await emit("newGame", { gameType: "ABC" }, jest.fn());
+        controller.init(socket, 'user_id');
+        await emit('newGame', { gameType: 'ABC' }, jest.fn());
 
         // assert
-        expect(newGame).toBeCalledWith("ABC", "user_id");
+        expect(newGame).toBeCalledWith('ABC', 'user_id');
       });
 
-      it("should return the ID of the created game", async () => {
+      it('should return the ID of the created game', async () => {
         // arrange
-        const newGame = jest.fn().mockResolvedValue("game_id");
+        const newGame = jest.fn().mockResolvedValue('game_id');
         mockGameService({
-          newGame,
+          newGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("newGame", { gameType: "ABC" }, callback);
+        await emit('newGame', { gameType: 'ABC' }, callback);
 
         // assert
-        expect(callback).toBeCalledWith("game_id");
+        expect(callback).toBeCalledWith('game_id');
       });
 
-      it("should return error message if service throws an error", async () => {
+      it('should return error message if service throws an error', async () => {
         // arrange
         const newGame = jest
           .fn()
-          .mockRejectedValue(new Error("Something went wrong"));
+          .mockRejectedValue(new Error('Something went wrong'));
         mockGameService({
-          newGame,
+          newGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("newGame", { gameType: "ABC" }, callback);
+        await emit('newGame', { gameType: 'ABC' }, callback);
 
         // assert
-        expect(callback).toBeCalledWith({ error: "Something went wrong" });
+        expect(callback).toBeCalledWith({ error: 'Something went wrong' });
       });
     });
 
-    describe("joinGame", () => {
-      it("should call joinGame of game service", async () => {
+    describe('joinGame', () => {
+      it('should call joinGame of game service', async () => {
         // arrange
-        const joinGame = jest.fn().mockResolvedValue("game_id");
+        const joinGame = jest.fn().mockResolvedValue('game_id');
         mockGameService({
-          joinGame,
+          joinGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         await emit(
-          "joinGame",
-          { gameId: "ABCA", playerName: "ABC" },
+          'joinGame',
+          { gameId: 'ABCA', playerName: 'ABC' },
           jest.fn()
         );
 
         // assert
         expect(joinGame).toBeCalledWith(
-          { gameId: "ABCA", playerName: "ABC" },
-          "user_id",
+          { gameId: 'ABCA', playerName: 'ABC' },
+          'user_id',
           expect.anything()
         );
       });
 
-      it("should return the game returned by the service", async () => {
+      it('should return the game returned by the service', async () => {
         // arrange
-        const joinGame = jest.fn().mockResolvedValue({ _id: "game_id" });
+        const joinGame = jest.fn().mockResolvedValue({ _id: 'game_id' });
         mockGameService({
-          joinGame,
+          joinGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("joinGame", {}, callback);
+        await emit('joinGame', {}, callback);
 
         // assert
-        expect(callback).toBeCalledWith({ _id: "game_id" });
+        expect(callback).toBeCalledWith({ _id: 'game_id' });
       });
 
-      it("should return error thrown from servie", async () => {
+      it('should return error thrown from servie', async () => {
         // arrange
-        const joinGame = jest.fn().mockRejectedValue(new Error("ABC"));
+        const joinGame = jest.fn().mockRejectedValue(new Error('ABC'));
         mockGameService({
-          joinGame,
+          joinGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("joinGame", {}, callback);
+        await emit('joinGame', {}, callback);
 
         // assert
-        expect(callback).toBeCalledWith({ error: "ABC" });
+        expect(callback).toBeCalledWith({ error: 'ABC' });
       });
     });
 
-    describe("getGame", () => {
-      it("should call getGame of game service", async () => {
+    describe('getGame', () => {
+      it('should call getGame of game service', async () => {
         // arrange
-        const getGame = jest.fn().mockResolvedValue({ _id: "game_id" });
+        const getGame = jest.fn().mockResolvedValue({ _id: 'game_id' });
         mockGameService({
-          getGame,
+          getGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
-        await emit("getGame", "game_id", jest.fn());
+        controller.init(socket, 'user_id');
+        await emit('getGame', 'game_id', jest.fn());
 
         // assert
-        expect(getGame).toBeCalledWith("game_id");
+        expect(getGame).toBeCalledWith('game_id');
       });
 
-      it("should return the game returned by the service", async () => {
+      it('should return the game returned by the service', async () => {
         // arrange
-        const getGame = jest.fn().mockResolvedValue({ _id: "game_id" });
+        const getGame = jest.fn().mockResolvedValue({ _id: 'game_id' });
         mockGameService({
-          getGame,
+          getGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("getGame", {}, callback);
+        await emit('getGame', {}, callback);
 
         // assert
-        expect(callback).toBeCalledWith({ _id: "game_id" });
+        expect(callback).toBeCalledWith({ _id: 'game_id' });
       });
 
-      it("should return error thrown from servie", async () => {
+      it('should return error thrown from servie', async () => {
         // arrange
         const getGame = jest
           .fn()
-          .mockRejectedValue(new Error("Cannot get game"));
+          .mockRejectedValue(new Error('Cannot get game'));
         mockGameService({
-          getGame,
+          getGame
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("getGame", {}, callback);
+        await emit('getGame', {}, callback);
 
         // assert
-        expect(callback).toBeCalledWith({ error: "Cannot get game" });
+        expect(callback).toBeCalledWith({ error: 'Cannot get game' });
       });
     });
 
-    describe("sendInitialNumber", () => {
-      it("should call handleSendInitialNumberRequest of game service", async () => {
+    describe('sendInitialNumber', () => {
+      it('should call handleSendInitialNumberRequest of game service', async () => {
         // arrange
         const handleSendInitialNumberRequest = jest
           .fn()
           .mockResolvedValue(true);
         mockGameService({
-          handleSendInitialNumberRequest,
+          handleSendInitialNumberRequest
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
-        await emit("sendInitialNumber", { number: 1 }, jest.fn());
+        controller.init(socket, 'user_id');
+        await emit('sendInitialNumber', { number: 1 }, jest.fn());
 
         // assert
         expect(handleSendInitialNumberRequest).toBeCalledWith(
           { number: 1 },
-          "user_id"
+          'user_id'
         );
       });
 
-      it("should return error thrown from servie", async () => {
+      it('should return error thrown from servie', async () => {
         // arrange
         const handleSendInitialNumberRequest = jest
           .fn()
-          .mockRejectedValue(new Error("Cannot send number"));
+          .mockRejectedValue(new Error('Cannot send number'));
 
         mockGameService({
-          handleSendInitialNumberRequest,
+          handleSendInitialNumberRequest
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("sendInitialNumber", {}, callback);
+        await emit('sendInitialNumber', {}, callback);
 
         // assert
-        expect(callback).toBeCalledWith({ error: "Cannot send number" });
+        expect(callback).toBeCalledWith({ error: 'Cannot send number' });
       });
     });
 
-    describe("divideNumber", () => {
-      it("should call divideNumber of game service", async () => {
+    describe('divideNumber', () => {
+      it('should call divideNumber of game service', async () => {
         // arrange
         const handleDivideNumberRequest = jest.fn().mockResolvedValue(true);
         mockGameService({
-          handleDivideNumberRequest,
+          handleDivideNumberRequest
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
-        await emit("divideNumber", { addition: 1 }, jest.fn());
+        controller.init(socket, 'user_id');
+        await emit('divideNumber', { addition: 1 }, jest.fn());
 
         // assert
         expect(handleDivideNumberRequest).toBeCalledWith(
           { addition: 1 },
-          "user_id"
+          'user_id'
         );
       });
 
-      it("should return error thrown from servie", async () => {
+      it('should return error thrown from servie', async () => {
         // arrange
         const handleDivideNumberRequest = jest
           .fn()
-          .mockRejectedValue(new Error("Cannot divide number"));
+          .mockRejectedValue(new Error('Cannot divide number'));
 
         mockGameService({
-          handleDivideNumberRequest,
+          handleDivideNumberRequest
         });
 
         const { socket, emit } = getMockSocket();
         const controller = container.get<Controller>(TYPES.Controller);
 
         // act
-        controller.init(socket, "user_id");
+        controller.init(socket, 'user_id');
         const callback = jest.fn();
-        await emit("divideNumber", {}, callback);
+        await emit('divideNumber', {}, callback);
 
         // assert
         expect(callback).toBeCalledWith({
-          error: "Cannot divide number",
+          error: 'Cannot divide number'
         });
       });
     });

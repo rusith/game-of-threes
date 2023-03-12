@@ -1,29 +1,21 @@
-import { injectable } from "inversify";
-import { ConfigProvider } from ".";
+import { injectable } from 'inversify';
+import { ConfigProvider } from '.';
 
 @injectable()
 export class EnvConfigProvider implements ConfigProvider {
   public getDbUrl(): string {
-    return process.env.DB_URI!;
+    return process.env.DB_URI ?? '';
   }
 
   public getPort(): number {
-    return parseInt(process.env.PORT || "8080");
-  }
-
-  public getRedisHost(): string {
-    return process.env.REDIS_HOST!;
-  }
-
-  public getRedisPort(): number {
-    return parseInt(process.env.REDIS_PORT!);
-  }
-
-  public getRedisPassword(): string {
-    return process.env.REDIS_PASSWORD!;
+    return parseInt(process.env.PORT || '8080');
   }
 
   public getFrontendUrl(): string {
-    return process.env.FRONTEND_URL!;
+    return process.env.FRONTEND_URL ?? '';
+  }
+
+  public getRedisUrl(): string {
+    return process.env.REDIS_URL ?? '';
   }
 }

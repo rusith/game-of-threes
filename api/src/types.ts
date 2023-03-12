@@ -1,14 +1,14 @@
 const TYPES = {
-  DBHelper: Symbol.for("DBHelper"),
-  SocketHelper: Symbol.for("SocketHelper"),
-  ConfigProvider: Symbol.for("ConfigProvider"),
-  QueueHelper: Symbol.for("QueueHelper"),
-  Controller: Symbol.for("Controller"),
+  DBHelper: Symbol.for('DBHelper'),
+  SocketHelper: Symbol.for('SocketHelper'),
+  ConfigProvider: Symbol.for('ConfigProvider'),
+  QueueHelper: Symbol.for('QueueHelper'),
+  Controller: Symbol.for('Controller'),
 
-  GameController: Symbol.for("GameController"),
-  GameService: Symbol.for("GameService"),
-  GameRepository: Symbol.for("GameRepository"),
-  GameEventsQueue: Symbol.for("GameEventsQueue"),
+  GameController: Symbol.for('GameController'),
+  GameService: Symbol.for('GameService'),
+  GameRepository: Symbol.for('GameRepository'),
+  GamePubSub: Symbol.for('GamePubSub')
 };
 
 export { TYPES };

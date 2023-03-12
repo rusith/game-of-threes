@@ -1,7 +1,7 @@
-import { GameType } from "@app/enums/game-type.enum";
-import mongoose from "mongoose";
-import { GameEvent, GameEventSchema } from "./schema/game-event";
-import { GamePlayer, GamePlayerSchema } from "./schema/game-player";
+import { GameType } from '@app/enums/game-type.enum';
+import mongoose from 'mongoose';
+import { GameEvent, GameEventSchema } from './schema/game-event';
+import { GamePlayer, GamePlayerSchema } from './schema/game-player';
 
 export interface Game {
   _id: string;
@@ -13,20 +13,20 @@ export interface Game {
 const GameSchema = new mongoose.Schema<Game, mongoose.Model<Game>, Game>({
   players: {
     type: [GamePlayerSchema],
-    required: true,
+    required: true
   },
   events: {
     type: [GameEventSchema],
-    required: true,
+    required: true
   },
   type: {
     type: mongoose.Schema.Types.String,
     required: true,
-    enum: Object.values(GameType),
-  },
+    enum: Object.values(GameType)
+  }
 });
 
 export const GameModel: mongoose.Model<Game> = mongoose.model<Game>(
-  "Game",
+  'Game',
   GameSchema
 );

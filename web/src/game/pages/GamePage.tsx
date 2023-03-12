@@ -43,6 +43,7 @@ const GamePage: React.FC = () => {
     setGameLoading(true);
 
     socket.emit("getGame", id, (game: Game) => {
+      console.log("GET GAME", game);
       if (handleSocketError(game)) {
         return;
       }
@@ -85,6 +86,8 @@ const GamePage: React.FC = () => {
   if (gameLoading || !game) {
     return <GameLoading />;
   }
+
+  console.log("game", game);
 
   return (
     <div className="flex flex-col h-full ">

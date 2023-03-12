@@ -1,5 +1,5 @@
 export enum GameType {
-  Automatic = "Automatic",
-  Manual = "Manual",
-  VsComputer = "VsComputer",
+  Automatic = 'Automatic',
+  Manual = 'Manual',
+  VsComputer = 'VsComputer'
 }

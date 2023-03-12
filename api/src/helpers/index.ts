@@ -1,5 +1,5 @@
-import { Controller } from "@app/interfaces/controller";
-import http from "http";
+import { Controller } from '@app/interfaces/controller';
+import http from 'http';
 
 export interface DBHelper {
   connect(dbUrl: string): Promise<void>;
@@ -16,12 +16,10 @@ export interface QueueHelper {
 }
 
 export interface ConfigProvider {
-  getRedisHost(): string;
-  getRedisPort(): number;
-  getRedisPassword(): string;
   getDbUrl(): string;
   getPort(): number;
   getFrontendUrl(): string;
+  getRedisUrl(): string;
 }
 
 export interface SocketHelper {

@@ -47,6 +47,7 @@ export interface GameRepository {
 
 export interface GamePubSub {
   init(): Promise<void>;
-  addListener(gameId: string, callback: (game: Game) => unknown): void;
+  addListener(gameId: string, callback: (game: Game) => unknown): string;
+  removeListener(gameId: string, listenerId: string): void;
   publish(game: Game): Promise<void>;
 }

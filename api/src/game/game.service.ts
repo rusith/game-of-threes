@@ -96,9 +96,13 @@ export class GameServiceImpl implements GameService {
       await this.gameRepository.update(data.gameId, game);
     }
 
-    this.gamePubSub.addListener(game._id.toString(), (game) =>
+    const listnerId = this.gamePubSub.addListener(game._id.toString(), (game) =>
       socket.emit('gameUpdated', game)
     );
+
+    socket.on('disconnect', () => {
+      this.gamePubSub.removeListener(game._id.toString(), listnerId);
+    });
 
     await this.gamePubSub.publish(game);
 

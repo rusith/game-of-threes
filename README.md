@@ -23,7 +23,7 @@ This will start a development server.
 click the `Join` button.
 - If the game mode is automatic/vs computer, the player will join the game automatically.
 - The player will have to wait for the other player to join the game.
-- The player can shared the link to another player or open another browser.
+- The player can share the link to another player or open another browser.
 - Once two players have joined the game, the game will start.
 - The first player will generate a random number.
 - Once the game started, the other player can select an addition in the case of manual mode or the app will select a number autmatically.
@@ -39,12 +39,11 @@ click the `Join` button.
 
 #### Notes
 
-- The app will connect to the API using only web-socket
+- The app will connect to the API using only web-sockets.
 - Redis pub/sub will be used to send game updates to the connected players in real time.
 - A database (MongoDB) will be used to persist the game state for later use.
-- The app should be distributable through a CDN
+- The app should be distributable through a CDN.
 - API will only keep connected sockets in memory. the API should be horizontally scalable.
-
 
 ### App notes
 
@@ -59,7 +58,7 @@ click the `Join` button.
 
 ### API notes
 
-- The app is a a Node.JS application
+- The API is a a Node.JS application.
 - Uses Socket.io to create the API.
   - Dotenv for configuration.
   - Vite for bundling.

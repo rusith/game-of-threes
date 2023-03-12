@@ -1,10 +1,10 @@
-import React from "react";
-import { socket } from "../../socket";
-import { GameEventType } from "../game.models";
-import { useGameStore } from "../game.state";
-import GameEventContainer from "./GameEventContainer";
-import Number from "./Number";
-import Text from "./Text";
+import React from 'react';
+import { socket } from '@app/socket';
+import { GameEventType } from '../game.models';
+import { useGameStore } from '../game.state';
+import GameEventContainer from './GameEventContainer';
+import Number from './Number';
+import Text from './Text';
 
 const NextEvent: React.FC = () => {
   const {
@@ -13,14 +13,14 @@ const NextEvent: React.FC = () => {
     gameId,
     handleSocketError,
     shouldShowNextEvent,
-    players,
+    players
   } = useGameStore((s) => ({
     player: s.getCurrentPlayer(),
     lastEvent: s.getLastEvent(),
     gameId: s.gameId,
     handleSocketError: s.handleSocketError,
     shouldShowNextEvent: s.shouldShowNextEvent,
-    players: s.game?.players,
+    players: s.game?.players
   }));
 
   if (
@@ -33,36 +33,36 @@ const NextEvent: React.FC = () => {
 
   const handleOnSelect = (addition: number) => {
     socket.emit(
-      "divideNumber",
+      'divideNumber',
       {
         gameId,
-        addition,
+        addition
       },
-      (data: any) => {
+      (data: string) => {
         handleSocketError(data);
       }
     );
   };
 
-  if (shouldShowNextEvent()) {
+  if (shouldShowNextEvent() && player) {
     return (
       <GameEventContainer
-        color={player!.color}
-        playerName={player!.name}
-        playerId={player?._id!}
+        color={player.color}
+        playerName={player.name}
+        playerId={player._id}
         focus={true}
       >
         <div className="flex">
           <Text text="(" />
-          <Number color={lastEvent!.player.color} number={lastEvent.number} />
-          <Number number={"-1"} onSelect={handleOnSelect} />
-          <Number number={"0"} onSelect={handleOnSelect} />
-          <Number number={"+1"} onSelect={handleOnSelect} />
+          <Number color={lastEvent.player.color} number={lastEvent.number} />
+          <Number number={'-1'} onSelect={handleOnSelect} />
+          <Number number={'0'} onSelect={handleOnSelect} />
+          <Number number={'+1'} onSelect={handleOnSelect} />
           <Text text=")" />
           <Text text="÷" />
           <Text text="3" />
           <Text text="=" />
-          <Number number={"?"} color={player?.color} />
+          <Number number={'?'} color={player?.color} />
         </div>
       </GameEventContainer>
     );
@@ -70,11 +70,15 @@ const NextEvent: React.FC = () => {
 
   const otherPlayer = players?.find((p) => p._id !== player?._id);
 
+  if (!otherPlayer) {
+    return null;
+  }
+
   return (
     <GameEventContainer
-      color={otherPlayer!.color}
-      playerName={otherPlayer!.name}
-      playerId={otherPlayer?._id!}
+      color={otherPlayer.color}
+      playerName={otherPlayer.name}
+      playerId={otherPlayer._id}
       focus={true}
     >
       Is Playing

@@ -1,7 +1,8 @@
-import { toast } from "react-hot-toast";
-import { create } from "zustand";
-import { socket } from "../socket";
-import { Game, GameEvent, GameEventType, GamePlayer } from "./game.models";
+import { toast } from 'react-hot-toast';
+import { create } from 'zustand';
+import { socket } from '@app/socket';
+import { Game, GameEvent, GameEventType, GamePlayer } from './game.models';
+import { playerIdKey } from '@app/consts';
 
 interface GameStore {
   gameId: string;
@@ -20,8 +21,9 @@ interface GameStore {
   getLastEvent: () => GameEvent | undefined;
   isLastPlayer: () => boolean;
   shouldShowNextEvent: () => boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleSocketError: (data: any) => boolean;
-  getLastPlayer: () => Pick<GamePlayer, "_id" | "color" | "name"> | undefined;
+  getLastPlayer: () => Pick<GamePlayer, '_id' | 'color' | 'name'> | undefined;
 }
 
 function getLastEvent(game: Game, index = -1): GameEvent | undefined {
@@ -33,7 +35,7 @@ function getLastEvent(game: Game, index = -1): GameEvent | undefined {
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
-  gameId: "",
+  gameId: '',
   game: null,
   gameLoading: false,
   isJoinGameModalOpen: false,
@@ -42,7 +44,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setGameLoading: (loading) => set({ gameLoading: loading }),
   setGame: (game) => set({ game }),
 
-  getCurrentPlayerId: () => localStorage.getItem("gamePlayerId"),
+  getCurrentPlayerId: () => localStorage.getItem(playerIdKey),
   getCurrentPlayer: () =>
     get().game?.players.find((p) => p._id === get().getCurrentPlayerId()),
   setIsJoinGameModalOpen: (isOpen) => set({ isJoinGameModalOpen: isOpen }),
@@ -50,7 +52,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     set({ isJoinGameModalOpen: false });
     socket.emit(
-      "joinGame",
+      'joinGame',
       { gameId: state.gameId, playerName },
       (game: Game) => {
         state.setGame(game);
@@ -60,7 +62,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isFirstPlayer: (playerId?: string) =>
     get().game?.players[0]?._id === (playerId || get().getCurrentPlayerId()),
   getLastEvent: () => {
-    return getLastEvent(get().game!);
+    const game = get().game;
+    return (game && getLastEvent(game)) ?? undefined;
   },
   getLastPlayer: () => get().getLastEvent()?.player,
   isLastPlayer: () =>
@@ -80,11 +83,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     return true;
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleSocketError: (data: any) => {
     if (data.error) {
       toast.error(data.error);
       return true;
     }
     return false;
-  },
+  }
 }));

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import Modal from "../../shared/components/Modal";
-import { useGameStore } from "../game.state";
+import React, { useState } from 'react';
+import Modal from '@app/shared/components/Modal';
+import { useGameStore } from '../game.state';
 
 const JoinGameModal: React.FC = () => {
-  const [playerName, setPlayerName] = useState("");
+  const [playerName, setPlayerName] = useState('');
   const joinGame = useGameStore((s) => s.joinGame);
 
   return (

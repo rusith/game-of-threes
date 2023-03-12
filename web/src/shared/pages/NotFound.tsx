@@ -1,6 +1,6 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { paths } from "../../routes";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { paths } from '@app/routes';
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();

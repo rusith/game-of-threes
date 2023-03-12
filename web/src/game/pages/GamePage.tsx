@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { socket } from "../../socket";
-import GameComponent from "../components/Game";
-import GameLoading from "../components/GameLoading";
-import JoinGameModal from "../components/JoinGameModal";
-import WaitingForPlayer from "../components/WaitingForPlayer";
-import { Game, GameType } from "../game.models";
-import { useGameStore } from "../game.state";
+import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { socket } from '@app/socket';
+import GameComponent from '../components/Game';
+import GameLoading from '../components/GameLoading';
+import JoinGameModal from '../components/JoinGameModal';
+import WaitingForPlayer from '../components/WaitingForPlayer';
+import { Game, GameType } from '../game.models';
+import { useGameStore } from '../game.state';
 
 const GamePage: React.FC = () => {
   const { id } = useParams();
@@ -20,7 +20,7 @@ const GamePage: React.FC = () => {
     joinGame,
     isJoinGameModalOpen,
     setIsJoinGameModalOpen,
-    handleSocketError,
+    handleSocketError
   } = useGameStore((s) => ({
     game: s.game,
     setGame: s.setGame,
@@ -31,7 +31,7 @@ const GamePage: React.FC = () => {
     joinGame: s.joinGame,
     isJoinGameModalOpen: s.isJoinGameModalOpen,
     setIsJoinGameModalOpen: s.setIsJoinGameModalOpen,
-    handleSocketError: s.handleSocketError,
+    handleSocketError: s.handleSocketError
   }));
 
   useEffect(() => {
@@ -42,8 +42,7 @@ const GamePage: React.FC = () => {
     setGameId(id);
     setGameLoading(true);
 
-    socket.emit("getGame", id, (game: Game) => {
-      console.log("GET GAME", game);
+    socket.emit('getGame', id, (game: Game) => {
       if (handleSocketError(game)) {
         return;
       }
@@ -74,20 +73,18 @@ const GamePage: React.FC = () => {
   useEffect(() => {
     if (!game?._id) return;
 
-    socket.on("gameUpdated", (updatedGame: Game) => {
+    socket.on('gameUpdated', (updatedGame: Game) => {
       setGame(updatedGame);
     });
 
     return () => {
-      socket.off("gameUpdated");
+      socket.off('gameUpdated');
     };
   }, [game?._id]);
 
   if (gameLoading || !game) {
     return <GameLoading />;
   }
-
-  console.log("game", game);
 
   return (
     <div className="flex flex-col h-full ">

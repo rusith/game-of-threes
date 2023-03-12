@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const Number: React.FC<{
   color?: string;
@@ -14,11 +14,11 @@ const Number: React.FC<{
     <div
       {...(onSelect ? {} : { style: { backgroundColor: color } })}
       className={
-        "rounded-full  text-black w-12 h-12 text-center align-middle pt-2 ml-2  " +
-        (number > 99 ? "text-lg" : "text-xl") +
+        'rounded-full  text-black w-12 h-12 text-center align-middle pt-2 ml-2  ' +
+        (number > 99 ? 'text-lg' : 'text-xl') +
         (onSelect
-          ? " bg-gray-300 cursor-pointer hover:scale-110 hover:bg-gray-100"
-          : "")
+          ? ' bg-gray-300 cursor-pointer hover:scale-110 hover:bg-gray-100'
+          : '')
       }
       onClick={handleOnClick}
     >

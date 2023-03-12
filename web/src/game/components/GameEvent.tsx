@@ -1,19 +1,21 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Game, GameEvent, GameEventType } from "../game.models";
-import GameEventContainer from "./GameEventContainer";
-import Number from "./Number";
-import Text from "./Text";
+import { paths } from '@app/routes';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Game, GameEvent, GameEventType } from '../game.models';
+import GameEventContainer from './GameEventContainer';
+import Number from './Number';
+import Text from './Text';
 
 const GameEvent: React.FC<{ event: GameEvent; game: Game; focus: boolean }> = ({
   event,
   game,
-  focus,
+  focus
 }) => {
-  const otherPlayer = game.players.find((p) => p._id !== event.player._id)!;
+  const otherPlayer = game.players.find((p) => p._id !== event.player._id);
   const navigate = useNavigate();
 
   function renderEvent() {
+    if (!otherPlayer) return null;
     switch (event.type) {
       case GameEventType.InitailNumber:
         return <Number number={event.number} color={event.player.color} />;
@@ -41,7 +43,7 @@ const GameEvent: React.FC<{ event: GameEvent; game: Game; focus: boolean }> = ({
             <p style={{ color: event.player.color }}>is the winner 🎉</p>
             <button
               className="p-2 bg-blue-500 mt-6 rounded hover:scale-110 duration-100 disabled:bg-gray-400"
-              onClick={() => navigate("/")}
+              onClick={() => navigate(paths.home)}
             >
               <p className="text-1xl text-transparent bg-gradient-to-b from-white to-white-t-60 bg-clip-text">
                 Home
@@ -52,7 +54,7 @@ const GameEvent: React.FC<{ event: GameEvent; game: Game; focus: boolean }> = ({
       case GameEventType.LoseLife:
         return (
           <p className="text-red-500">
-            {event.number} is not divicible by 3. only {event.remainigLives}{" "}
+            {event.number} is not divicible by 3. only {event.remainigLives}{' '}
             lives left.
           </p>
         );

@@ -1,18 +1,18 @@
-import React from "react";
-import { toast } from "react-hot-toast";
-import { useGameStore } from "../game.state";
+import React from 'react';
+import { toast } from 'react-hot-toast';
+import { useGameStore } from '../game.state';
 
 const WaitingForPlayer: React.FC = () => {
   const gameId = useGameStore((s) => s.gameId);
 
   function copyLinkToClipboard() {
-    const el = document.createElement("textarea");
+    const el = document.createElement('textarea');
     el.value = `${window.location.origin}/game/${gameId}`;
     document.body.appendChild(el);
     el.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     document.body.removeChild(el);
-    toast.success("Link copied to clipboard!");
+    toast.success('Link copied to clipboard!');
   }
 
   return (

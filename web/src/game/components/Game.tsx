@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { socket } from "../../socket";
-import { GameEventType } from "../game.models";
-import { useGameStore } from "../game.state";
-import GameEvent from "./GameEvent";
-import NextEvent from "./NextEvent";
+import React, { useEffect } from 'react';
+import { socket } from '@app/socket';
+import { GameEventType } from '../game.models';
+import { useGameStore } from '../game.state';
+import GameEvent from './GameEvent';
+import NextEvent from './NextEvent';
 
 const Game: React.FC = () => {
   const {
@@ -12,7 +12,7 @@ const Game: React.FC = () => {
     isFirstPlayer,
     getLastEvent,
     isLastPlayer,
-    handleSocketError,
+    handleSocketError
   } = useGameStore((s) => ({
     game: s.game,
     getCurrentPlayer: s.getCurrentPlayer,
@@ -21,7 +21,7 @@ const Game: React.FC = () => {
     getCurrentPlayerId: s.getCurrentPlayerId,
     isLastPlayer: s.isLastPlayer,
     shouldShowNextEvent: s.shouldShowNextEvent,
-    handleSocketError: s.handleSocketError,
+    handleSocketError: s.handleSocketError
   }));
 
   if (!game) {
@@ -38,12 +38,12 @@ const Game: React.FC = () => {
     // the first player starts the game
     if (isFirstPlayer()) {
       socket.emit(
-        "sendInitialNumber",
+        'sendInitialNumber',
         {
           gameId: game._id,
-          number: Math.floor(Math.random() * (200 - 50)) + 50,
+          number: Math.floor(Math.random() * (200 - 50)) + 50
         },
-        (res: any) => {
+        (res: string) => {
           handleSocketError(res);
         }
       );
@@ -52,7 +52,7 @@ const Game: React.FC = () => {
 
   const lastEvent = getLastEvent();
 
-  if (lastEvent && !isLastPlayer()) {
+  if (player && lastEvent && !isLastPlayer()) {
     const divicibleBy3 = (num: number) => num % 3 === 0;
 
     if (
@@ -61,18 +61,18 @@ const Game: React.FC = () => {
     ) {
       const emit = (addition: number) => {
         socket.emit(
-          "divideNumber",
+          'divideNumber',
           {
             gameId: game._id,
-            addition,
+            addition
           },
-          (data: any) => {
+          (data: string) => {
             handleSocketError(data);
           }
         );
       };
 
-      if (player!.automatic) {
+      if (player.automatic) {
         if (divicibleBy3(lastEvent.number + 0)) emit(0);
         else if (divicibleBy3(lastEvent.number + 1)) emit(1);
         else if (divicibleBy3(lastEvent.number - 1)) emit(-1);
@@ -99,7 +99,7 @@ const Game: React.FC = () => {
                     className="w-7 inline-block"
                     src="/heart.svg"
                     alt="Lives"
-                  />{" "}
+                  />{' '}
                   <span className="text-xl">{p.remainingLives}</span>
                 </>
               )}

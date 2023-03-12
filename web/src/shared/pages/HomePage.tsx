@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Modal from "../components/Modal";
-import { socket } from "../../socket";
-import { toast } from "react-hot-toast";
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Modal from '../components/Modal';
+import { socket } from '@app/socket';
+import { toast } from 'react-hot-toast';
+import { paths } from '@app/routes';
+import { GameType } from '@app/game/game.models';
 
 const HomePage: React.FC = () => {
   const [isConnected, setIsConnected] = React.useState(socket.connected);
   const [isShowNewGameModal, setIsShowNewGameModal] = React.useState(false);
-  const [gameType, setGameType] = React.useState("Manual");
+  const [gameType, setGameType] = React.useState(GameType.Manual);
 
   const navigate = useNavigate();
 
@@ -16,10 +18,10 @@ const HomePage: React.FC = () => {
       setIsConnected(true);
     };
 
-    socket.on("connect", onConnect);
+    socket.on('connect', onConnect);
 
     return () => {
-      socket.off("connect", onConnect);
+      socket.off('connect', onConnect);
     };
   }, []);
 
@@ -29,15 +31,15 @@ const HomePage: React.FC = () => {
 
   function handleStartGame() {
     socket.emit(
-      "newGame",
+      'newGame',
       {
-        gameType,
+        gameType
       },
-      (val: any) => {
+      (val: string & { error: string }) => {
         if (val.error) {
           toast.error(val.error);
         } else {
-          navigate("/game/" + val);
+          navigate(paths.game(val));
         }
       }
     );
@@ -58,7 +60,7 @@ const HomePage: React.FC = () => {
         onClick={handleNewGameClick}
       >
         <p className="text-1xl text-transparent bg-gradient-to-b from-white to-white-t-60 bg-clip-text">
-          {isConnected ? "New Game" : "Loading..."}
+          {isConnected ? 'New Game' : 'Loading...'}
         </p>
       </button>
 
@@ -69,21 +71,21 @@ const HomePage: React.FC = () => {
             <select
               className="h-9 rounded mt-1 p-1 text-gray-700 outline-none"
               value={gameType}
-              onChange={(e) => setGameType(e.target.value)}
+              onChange={(e) => setGameType(e.target.value as GameType)}
             >
-              <option value="Manual">Manual</option>
-              <option value="Automatic">Automatic</option>
-              <option value="VsComputer">vs Computer</option>
+              <option value={GameType.Manual}>Manual</option>
+              <option value={GameType.Automatic}>Automatic</option>
+              <option value={GameType.VsComputer}>vs Computer</option>
             </select>
-            {gameType === "VsComputer" && (
+            {gameType === 'VsComputer' && (
               <p className="text-sm text-gray-600 mt-2">
                 Play with the computer
               </p>
             )}
-            {gameType === "Manual" && (
+            {gameType === 'Manual' && (
               <p className="text-sm text-gray-600 mt-2">Play with a friend</p>
             )}
-            {gameType === "Automatic" && (
+            {gameType === 'Automatic' && (
               <p className="text-sm text-gray-600 mt-2">
                 See how two computers play
               </p>
@@ -97,13 +99,13 @@ const HomePage: React.FC = () => {
               onClick={handleStartGame}
             >
               <p className="text-1xl text-transparent bg-gradient-to-b from-white to-white-t-60 bg-clip-text">
-                {isConnected ? "Start" : "Loading..."}
+                {isConnected ? 'Start' : 'Loading...'}
               </p>
             </button>
             <button
               className="p-2 bg-red-500 mt-6 rounded hover:scale-110 duration-100 disabled:bg-gray-400 ml-5"
               onClick={() => {
-                setGameType("Manual");
+                setGameType(GameType.Manual);
                 setIsShowNewGameModal(false);
               }}
             >

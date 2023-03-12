@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useGameStore } from "../game.state";
+import React, { useEffect } from 'react';
+import { useGameStore } from '../game.state';
 
 const GameEventContainer: React.FC<{
   children: React.ReactNode;
@@ -10,29 +10,28 @@ const GameEventContainer: React.FC<{
 }> = ({ color, children, playerName, playerId, focus }) => {
   const { isFirstPlayer } = useGameStore((s) => ({
     isFirstPlayer: s.isFirstPlayer(playerId),
-    player: s.getCurrentPlayer,
+    player: s.getCurrentPlayer
   }));
 
   const ref = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (focus) {
-      console.log(ref.current);
-      ref.current?.scrollIntoView({ behavior: "smooth" });
+      ref.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [focus]);
 
   return (
     <div
       ref={ref}
-      className={"flex mt-5 " + (isFirstPlayer ? "mr-auto" : "ml-auto")}
+      className={'flex mt-5 ' + (isFirstPlayer ? 'mr-auto' : 'ml-auto')}
     >
       {!isFirstPlayer && <div className="w-14"></div>}
       <div className="flex-col flex">
         <p
           style={{ color }}
           className={
-            "text-2xl mb-2 " + (isFirstPlayer ? "text-left" : "text-right")
+            'text-2xl mb-2 ' + (isFirstPlayer ? 'text-left' : 'text-right')
           }
         >
           {playerName}

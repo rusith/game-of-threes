@@ -3,6 +3,6 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install
 COPY . .
-RUN rm /app/.env
+RUN rm -f /app/.env
 EXPOSE 8080
 CMD ["yarn", "dev"]

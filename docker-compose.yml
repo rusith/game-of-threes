@@ -19,6 +19,8 @@ services:
       - REDIS_URL=redis://redis:6379
   db:
     image: mongo:latest
+    volumes:
+      - mongo-data:/data/db
   redis:
     image: redis:latest
   web:
@@ -35,5 +37,5 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_URL=http://api:8080
-
-    
+volumes:
+  mongo-data:
